@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View } from "react-native";
 
-export default function AboutScreen() {
+export default function ProfileScreen() {
 	return (
 		<View style={styles.container}>
-			<Text style={styles.text}>About Screen</Text>
+			<Text style={styles.text}>Profile Screen</Text>
 		</View>
 	);
 }
@@ -11,11 +11,11 @@ export default function AboutScreen() {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#25292e",
+		backgroundColor: "#f1e9d2",
 		justifyContent: "center",
 		alignItems: "center",
 	},
 	text: {
-		color: "#fff",
+		color: "#0e162d",
 	},
 });
