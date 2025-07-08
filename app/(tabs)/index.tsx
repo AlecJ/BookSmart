@@ -1,9 +1,16 @@
+import Book from "@/components/book";
 import { StyleSheet, Text, View } from "react-native";
+
+const PlaceholderImage = require("@/assets/images/LettersToAYoungChef.jpg");
 
 export default function Index() {
 	return (
 		<View style={styles.container}>
-			<Text style={styles.text}>Home Screen</Text>
+			<Book imgSource={PlaceholderImage} enableNavBtn />
+			<Text style={styles.text}>Other in progress books</Text>
+			<Text style={styles.text}>
+				OR "Search for a book to add to your reading list."
+			</Text>
 		</View>
 	);
 }
