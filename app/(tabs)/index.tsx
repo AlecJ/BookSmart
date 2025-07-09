@@ -6,7 +6,12 @@ const PlaceholderImage = require("@/assets/images/LettersToAYoungChef.jpg");
 export default function Index() {
 	return (
 		<View style={styles.container}>
-			<Book imgSource={PlaceholderImage} enableNavBtn />
+			<Book
+				imgSource={PlaceholderImage}
+				width={"85vw"}
+				height={"120vw"}
+				enableNavBtn
+			/>
 			<Text style={styles.text}>Other in progress books</Text>
 			<Text style={styles.text}>
 				OR "Search for a book to add to your reading list."
@@ -17,10 +22,10 @@ export default function Index() {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
+		height: "100%",
+		paddingTop: "1.5rem",
 		backgroundColor: "#f1e9d2",
 		alignItems: "center",
-		justifyContent: "center",
 	},
 	text: {
 		color: "#0e162d",
