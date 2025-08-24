@@ -2,8 +2,13 @@
 
 BookSmart is a companion app for readers that enhances comprehension with chapter-end quizzes and feedback via ChatGPT.
 
-Front End: Expo, ReactJS, TypeScript
+Front End: Expo, React Native, TypeScript
 Back End:
+
+## To Do
+
+-   Home page shows bookshelf with recent books
+-   placeholder book covers should be generated with title (and random color)
 
 ...
 
@@ -21,6 +26,12 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
     ```bash
     npx expo start
+    ```
+
+    or if there is an issue connecting with your mobile device:
+
+    ```bash
+    npx expo start --tunnel
     ```
 
 In the output, you'll find options to open the app in a

@@ -10,46 +10,31 @@ import {
 	View,
 } from "react-native";
 
+// const placeholderImage = require("@/assets/images/book-cover-placeholder.png");
+const placeholderImage = require("@/assets/images/LettersToAYoungChef.jpg");
+
 type Props = {
-	imgSource: ImageSourcePropType;
-	enableNavBtn?: boolean;
-	width?: number;
-	height?: number;
+	imgSource?: ImageSourcePropType;
+	showContinueBtn?: boolean;
+	onPress: () => void;
 };
 
-export default function Book({
-	imgSource,
-	enableNavBtn,
-	width,
-	height,
-}: Props) {
-	const [isHovered, setIsHovered] = useState(false);
-	const calcWidth = width ? width : 200;
-	const calcHeight = height ? height : 300;
+export default function Book({ imgSource, showContinueBtn, onPress }: Props) {
+	const [isHovered, setIsHovered] = useState<boolean>(false);
 
 	return (
 		<>
 			<Pressable
+				onPress={onPress}
 				onHoverIn={() => setIsHovered(true)}
 				onHoverOut={() => setIsHovered(false)}
-				onPress={() => {
-					alert("Enter book.");
-				}}
-				style={[
-					styles.book,
-					{
-						width: calcWidth,
-						height: calcHeight,
-					},
-				]}
+				style={styles.bookContainer}
 			>
 				<Image
-					source={imgSource}
+					source={imgSource ? imgSource : placeholderImage}
 					style={[
 						styles.book,
 						{
-							width: calcWidth,
-							height: calcHeight,
 							opacity: isHovered ? 0.7 : 1,
 						},
 					]}
@@ -58,44 +43,52 @@ export default function Book({
 				<View style={styles.progressBarContainer}>
 					<ProgressBar />
 				</View>
+				{/* </Pressable> */}
+				{showContinueBtn ? (
+					<View style={styles.continueBtn}>
+						<Text style={styles.continueBtnLabel}>Continue</Text>
+						<Ionicons
+							name={"arrow-forward-circle-outline"}
+							color={"#0e162d"}
+							size={20}
+						/>
+					</View>
+				) : null}
 			</Pressable>
-			{enableNavBtn ? (
-				<Pressable style={styles.button}>
-					<Text style={styles.buttonLabel}>Continue</Text>
-					<Ionicons
-						name={"arrow-forward-circle-outline"}
-						color={"#0e162d"}
-						size={20}
-					/>
-				</Pressable>
-			) : null}
 		</>
 	);
 }
 
 const styles = StyleSheet.create({
+	bookContainer: {
+		width: "100%",
+		height: "100%",
+	},
 	book: {
 		borderRadius: 18,
 		overflow: "hidden",
+		width: "100%",
+		height: "100%",
 	},
 	progressBarContainer: {
 		position: "relative",
 		bottom: 15,
 		zIndex: 50,
 	},
-	button: {
+	continueBtn: {
 		width: 120,
-		height: 40,
+		height: 55,
 		backgroundColor: "#f4f4f4",
-		position: "relative",
-		bottom: 65,
 		borderRadius: 10,
 		alignItems: "center",
 		justifyContent: "center",
 		flexDirection: "row",
 		gap: 5,
+		position: "absolute",
+		bottom: 30,
+		right: 15,
 	},
-	buttonLabel: {
+	continueBtnLabel: {
 		fontSize: 16,
 	},
 });

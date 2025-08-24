@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
 	},
 	progressFill: {
 		height: "100%",
-		backgroundColor: "#f5f57f",
+		backgroundColor: "#f9f954ff",
 		width: "50%", // Example width, should be dynamic based on progress
 	},
 });
