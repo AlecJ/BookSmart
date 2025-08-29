@@ -4,4 +4,5 @@ export interface BookType {
 	name: string;
 	imgSrc?: ImageSourcePropType;
 	progress?: number;
+	author?: string;
 }

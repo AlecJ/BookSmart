@@ -9,12 +9,19 @@ const placeholderImage = require("@/assets/images/book-cover-placeholder.png");
 
 type Props = {
 	showContinueBtn?: boolean;
-	onPress: () => void;
+	showProgressBar?: boolean;
+	onPress?: () => void;
 	style?: ViewStyle;
 	book: BookType;
 };
 
-export default function Book({ showContinueBtn, onPress, style, book }: Props) {
+export default function Book({
+	showContinueBtn,
+	onPress,
+	style,
+	book,
+	showProgressBar,
+}: Props) {
 	const [isHovered, setIsHovered] = useState<boolean>(false);
 
 	return (
@@ -28,6 +35,7 @@ export default function Book({ showContinueBtn, onPress, style, book }: Props) {
 				<Image
 					source={book.imgSrc ? book.imgSrc : placeholderImage}
 					style={[
+						style,
 						styles.book,
 						{
 							opacity: isHovered ? 0.7 : 1,
@@ -35,7 +43,7 @@ export default function Book({ showContinueBtn, onPress, style, book }: Props) {
 					]}
 					transition={200}
 				/>
-				{book.progress ? (
+				{showProgressBar && book.progress ? (
 					<View style={styles.progressBarContainer}>
 						<ProgressBar fillPercent={book.progress} />
 					</View>
@@ -58,10 +66,8 @@ export default function Book({ showContinueBtn, onPress, style, book }: Props) {
 
 const styles = StyleSheet.create({
 	book: {
-		borderRadius: 18,
-		overflow: "hidden",
 		width: "100%",
-		aspectRatio: 2 / 3,
+		height: "100%",
 	},
 	progressBarContainer: {
 		position: "relative",
@@ -70,7 +76,7 @@ const styles = StyleSheet.create({
 	},
 	continueBtn: {
 		width: 120,
-		height: 55,
+		height: 50,
 		backgroundColor: "#f4f4f4",
 		borderRadius: 10,
 		alignItems: "center",
@@ -78,8 +84,8 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		gap: 5,
 		position: "absolute",
-		bottom: 30,
-		right: 15,
+		bottom: 45,
+		right: 30,
 	},
 	continueBtnLabel: {
 		fontSize: 16,
