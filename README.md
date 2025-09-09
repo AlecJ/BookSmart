@@ -7,6 +7,7 @@ Back End:
 
 ## To Do
 
+-   Finish pages outline
 -   Home page shows bookshelf with recent books
 -   placeholder book covers should be generated with title (and random color)
 
