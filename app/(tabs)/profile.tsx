@@ -1,10 +1,18 @@
 import BookRow from "@/components/bookRow";
 import { BookType } from "@/types";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import {
+	Platform,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TextInput,
+	View,
+} from "react-native";
 
 const books: BookType[] = [
 	{
-		name: "Letters to a Young Chef",
+		name: "Letters_to_a_Young_Chef",
+		prettyName: "Letters to a Young Chef",
 		imgSrc: require("@/assets/images/LettersToAYoungChef.jpg"),
 		progress: 0.75,
 		author: "Daniel Boulud",
@@ -20,38 +28,48 @@ const books: BookType[] = [
 ];
 
 export default function ProfileScreen() {
-	return (
-		<View style={styles.profilePage}>
-			<View style={styles.profileColumn}>
-				<View style={styles.profileContainer}>
-					<Text style={styles.profileContainerHeader}>
-						Your Profile
-					</Text>
-					<View style={styles.profileImage}></View>
-					<View style={styles.userDetails}>
-						<View style={styles.userDetailsRow}>
-							<Text>Name:</Text>
-							<TextInput
-								style={styles.textInput}
-								placeholder="Name"
-							/>
+	const isWeb = Platform.OS === "web";
+
+	return (() => {
+		const content = (
+			<>
+				<View style={styles.profileColumn}>
+					<View style={styles.profileContainer}>
+						<Text style={styles.profileContainerHeader}>
+							Your Profile
+						</Text>
+						<View style={styles.profileImage}></View>
+						<View style={styles.userDetails}>
+							<View style={styles.userDetailsRow}>
+								<Text>Name:</Text>
+								<TextInput
+									style={styles.textInput}
+									placeholder="Name"
+								/>
+							</View>
 						</View>
+						<View style={styles.profileControls}></View>
 					</View>
-					<View style={styles.profileControls}></View>
 				</View>
-			</View>
-			<View style={styles.historyColumn}>
-				<Text style={styles.historyHeader}>Reading History</Text>
-				{books.map((book, index) => (
-					<BookRow
-						book={book}
-						key={index}
-						style={{ marginBottom: 12 }}
-					/>
-				))}
-			</View>
-		</View>
-	);
+				<View style={styles.historyColumn}>
+					<Text style={styles.historyHeader}>Reading History</Text>
+					{books.map((book, index) => (
+						<BookRow
+							book={book}
+							key={index}
+							style={{ marginBottom: 12 }}
+						/>
+					))}
+				</View>
+			</>
+		);
+
+		return isWeb ? (
+			<View style={styles.profilePage}>{content}</View>
+		) : (
+			<ScrollView>{content}</ScrollView>
+		);
+	})();
 }
 
 const styles = StyleSheet.create({

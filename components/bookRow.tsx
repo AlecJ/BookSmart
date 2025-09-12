@@ -18,7 +18,9 @@ export default function BookRow({ book, style }: Props) {
 				}}
 			></Book>
 			<View style={styles.bookDetails}>
-				<Text style={styles.bookTitle}>{book.name}</Text>
+				<Text style={styles.bookTitle}>
+					{book.prettyName || book.name}
+				</Text>
 				<Text>by {book.author}</Text>
 			</View>
 
@@ -34,6 +36,7 @@ const styles = StyleSheet.create({
 	rowContainer: {
 		height: 96,
 		width: 550,
+		maxWidth: "100%",
 		flexDirection: "row",
 		backgroundColor: "rgba(236, 211, 168, 1)",
 		alignItems: "center",

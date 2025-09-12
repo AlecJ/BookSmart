@@ -2,14 +2,13 @@ import { useLocalSearchParams } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function BookDetailsScreen() {
-	const { bookId } = useLocalSearchParams();
+	const { bookId, chapterNum } = useLocalSearchParams();
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.text}>Book Details Screen</Text>
-			<Text style={styles.text}>Book Title: {bookId}</Text>
-			<Text style={styles.text}>Author</Text>
-			<Text style={styles.text}>Description</Text>
+			<Text style={styles.text}>Book Chapter Screen</Text>
+			<Text style={styles.text}>Book ID: {bookId}</Text>
+			<Text style={styles.text}>Chapter Number: {chapterNum}</Text>
 		</View>
 	);
 }

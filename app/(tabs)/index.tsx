@@ -1,18 +1,14 @@
 import Book from "@/components/book";
-import Modal from "@/components/modal";
 import { BookType } from "@/types";
 import { Link } from "expo-router";
-import { useState } from "react";
 import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function Index() {
-	const [modalVisible, setModalVisible] = useState<boolean>(false);
-
 	const isWeb = Platform.OS === "web";
 
 	const books: BookType[] = [
 		{
-			name: "Letters to a Young Chef",
+			name: "Letters_to_a_Young_Chef",
 			imgSrc: require("@/assets/images/LettersToAYoungChef.jpg"),
 			progress: 0.75,
 		},
@@ -28,13 +24,6 @@ export default function Index() {
 
 	return (
 		<>
-			<Modal
-				isVisible={modalVisible}
-				onClose={() => setModalVisible(false)}
-			>
-				<Text>Lorem Ipsum</Text>
-			</Modal>
-
 			{books.length === 0 ? (
 				<Text>Search for books to read.</Text>
 			) : (
@@ -42,7 +31,7 @@ export default function Index() {
 					const content = (
 						<>
 							<View style={styles.container}>
-								<Link asChild href={`/book/${books[0].name}`}>
+								<Link asChild href={`/read/${books[0].name}`}>
 									<Book
 										style={styles.mainBook}
 										book={books[0]}
@@ -58,9 +47,6 @@ export default function Index() {
 											key={index}
 											book={book}
 											style={styles.smallBook}
-											onPress={() =>
-												setModalVisible(true)
-											}
 										/>
 									))}
 								</View>
