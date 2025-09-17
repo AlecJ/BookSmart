@@ -6,8 +6,7 @@ export default function BookDetailsScreen() {
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.text}>Book Chapter Question Screen</Text>
-			<Text style={styles.text}>Question Number: 1</Text>
+			<Text style={styles.text}>Question</Text>
 		</View>
 	);
 }

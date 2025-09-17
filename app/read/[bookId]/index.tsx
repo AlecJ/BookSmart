@@ -1,5 +1,5 @@
 import { Link, useLocalSearchParams } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { Button, StyleSheet, Text, View } from "react-native";
 
 export default function BookDetailsScreen() {
 	const { bookId } = useLocalSearchParams();
@@ -11,7 +11,7 @@ export default function BookDetailsScreen() {
 			<Text style={styles.text}>Author</Text>
 			<Text style={styles.text}>Description</Text>
 			<Link asChild href={`./${bookId}/chapters`}>
-				<Text style={styles.text}>BookSmart</Text>
+				<Button title="BookSmart" />
 			</Link>
 		</View>
 	);
