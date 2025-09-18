@@ -1,19 +1,13 @@
-import Header from "@/components/header";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Slot, Tabs } from "expo-router";
-import { Platform, StyleSheet, View } from "react-native";
+import { Platform, View } from "react-native";
 
 export default function TabLayout() {
 	if (Platform.OS === "web") {
 		return (
-			<>
-				<Header />
-				<View style={styles.page}>
-					<View style={styles.content}>
-						<Slot />
-					</View>
-				</View>
-			</>
+			<View>
+				<Slot />
+			</View>
 		);
 	}
 
@@ -76,18 +70,3 @@ const tabsScreenOptions = {
 		backgroundColor: "#e6d7ae",
 	},
 };
-
-const styles = StyleSheet.create({
-	page: {
-		backgroundColor: "#f1e9d2",
-		justifyContent: "center",
-		alignItems: "center",
-		flex: 1,
-		overflowY: "scroll",
-	},
-	content: {
-		flex: 1,
-		width: "100%",
-		maxWidth: 970,
-	},
-});

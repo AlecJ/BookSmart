@@ -1,3 +1,4 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -11,7 +12,15 @@ export default function Header() {
 					<Text style={styles.headerText}>BookSmart</Text>
 				</Link>
 			</View>
-			<View style={styles.headerSearchBar}></View>
+			<View style={styles.headerSearchBar}>
+				<Link href={`/search`}>
+					<Ionicons
+						name={"search-outline"}
+						color={"#0e162d"}
+						size={20}
+					/>
+				</Link>
+			</View>
 			<View style={styles.rightHeaderSection}>
 				<Link asChild href={`/profile`}>
 					<Text style={styles.headerText}>Profile</Text>
@@ -25,6 +34,9 @@ export default function Header() {
 
 const styles = StyleSheet.create({
 	header: {
+		// position: "absolute",
+		// top: 0,
+		width: "100%",
 		height: 60,
 		paddingLeft: 8,
 		paddingRight: 8,
@@ -41,13 +53,15 @@ const styles = StyleSheet.create({
 		margin: 8,
 	},
 	headerSearchBar: {
-		width: 400,
+		maxWidth: 500,
 		height: 40,
 		backgroundColor: "#fafafa",
 		borderColor: "#fafafa",
 		borderWidth: 1,
 		borderRadius: 5,
 		paddingHorizontal: 8,
+		justifyContent: "center",
+		flex: 1,
 	},
 	rightHeaderSection: {
 		flex: 1,

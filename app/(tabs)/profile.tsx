@@ -1,6 +1,7 @@
 import BookRow from "@/components/bookRow";
 import { BookType } from "@/types";
 import {
+	FlatList,
 	Platform,
 	ScrollView,
 	StyleSheet,
@@ -21,10 +22,13 @@ const books: BookType[] = [
 	{ name: "Book 3" },
 	{ name: "Book 4" },
 	{ name: "Book 5" },
-	{ name: "Book 9" },
 	{ name: "Book 6" },
 	{ name: "Book 7" },
 	{ name: "Book 8" },
+	{ name: "Book 9" },
+	{ name: "Book 10" },
+	{ name: "Book 11" },
+	{ name: "Book 12" },
 ];
 
 export default function ProfileScreen() {
@@ -53,13 +57,14 @@ export default function ProfileScreen() {
 				</View>
 				<View style={styles.historyColumn}>
 					<Text style={styles.historyHeader}>Reading History</Text>
-					{books.map((book, index) => (
-						<BookRow
-							book={book}
-							key={index}
-							style={{ marginBottom: 12 }}
-						/>
-					))}
+					<FlatList
+						style={{ flex: 1, minHeight: 0 }}
+						data={books}
+						renderItem={({ item }) => <BookRow book={item} />}
+						keyExtractor={(item, index) => index.toString()}
+						showsVerticalScrollIndicator
+						contentContainerStyle={{ paddingBottom: 16 }}
+					/>
 				</View>
 			</>
 		);
@@ -76,9 +81,16 @@ const styles = StyleSheet.create({
 	profilePage: {
 		flex: 1,
 		flexDirection: "row",
-		width: "100%",
+		height: "100%",
+		borderWidth: 2,
+		borderColor: "red",
 	},
-	profileColumn: { flex: 1, alignItems: "center", justifyContent: "center" },
+	profileColumn: {
+		flex: 1,
+		maxHeight: "100%",
+		alignItems: "center",
+		justifyContent: "center",
+	},
 	profileContainer: {
 		flex: 1,
 		width: "100%",
@@ -105,12 +117,12 @@ const styles = StyleSheet.create({
 		backgroundColor: "#fff",
 		height: 30,
 	},
-	historyColumn: { flex: 2, alignItems: "center" },
-	historyHeader: { fontSize: 20, marginTop: 20, marginBottom: 20 },
-	container: {
-		flex: 1,
-		backgroundColor: "#f1e9d2",
-		justifyContent: "center",
-		alignItems: "center",
+	historyColumn: {
+		height: 2000,
+		// flex: 1,
+		// flexDirection: "column",
+		// overflowY: "auto",
+		// minHeight: 0,
 	},
+	historyHeader: { fontSize: 20, marginTop: 20, marginBottom: 20 },
 });
