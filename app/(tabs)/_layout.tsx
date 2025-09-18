@@ -1,11 +1,11 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Slot, Tabs } from "expo-router";
-import { Platform, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 
 export default function TabLayout() {
 	if (Platform.OS === "web") {
 		return (
-			<View>
+			<View style={styles.container}>
 				<Slot />
 			</View>
 		);
@@ -70,3 +70,7 @@ const tabsScreenOptions = {
 		backgroundColor: "#e6d7ae",
 	},
 };
+
+const styles = StyleSheet.create({
+	container: {},
+});

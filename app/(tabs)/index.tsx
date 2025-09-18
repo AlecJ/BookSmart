@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
 	},
 	bookContainer: {},
 	mainBook: {
-		height: "100%",
+		width: "100%",
 		aspectRatio: 2 / 3,
 		padding: 15,
 		borderRadius: 15,

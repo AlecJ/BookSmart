@@ -39,9 +39,7 @@ export default function ProfileScreen() {
 			<>
 				<View style={styles.profileColumn}>
 					<View style={styles.profileContainer}>
-						<Text style={styles.profileContainerHeader}>
-							Your Profile
-						</Text>
+						<Text style={styles.columnHeader}>Your Profile</Text>
 						<View style={styles.profileImage}></View>
 						<View style={styles.userDetails}>
 							<View style={styles.userDetailsRow}>
@@ -52,18 +50,17 @@ export default function ProfileScreen() {
 								/>
 							</View>
 						</View>
-						<View style={styles.profileControls}></View>
+						<View></View>
 					</View>
 				</View>
 				<View style={styles.historyColumn}>
-					<Text style={styles.historyHeader}>Reading History</Text>
+					<Text style={styles.columnHeader}>Reading History</Text>
 					<FlatList
 						style={{ flex: 1, minHeight: 0 }}
 						data={books}
 						renderItem={({ item }) => <BookRow book={item} />}
 						keyExtractor={(item, index) => index.toString()}
 						showsVerticalScrollIndicator
-						contentContainerStyle={{ paddingBottom: 16 }}
 					/>
 				</View>
 			</>
@@ -81,26 +78,25 @@ const styles = StyleSheet.create({
 	profilePage: {
 		flex: 1,
 		flexDirection: "row",
-		height: "100%",
 		borderWidth: 2,
 		borderColor: "red",
 	},
+	columnHeader: {
+		fontSize: 20,
+		marginTop: 20,
+		marginBottom: 16,
+		textAlign: "center",
+	},
 	profileColumn: {
-		flex: 1,
-		maxHeight: "100%",
-		alignItems: "center",
-		justifyContent: "center",
+		flex: 2,
+		maxHeight: 600,
+		borderWidth: 2,
+		borderColor: "blue",
 	},
 	profileContainer: {
 		flex: 1,
-		width: "100%",
-		maxHeight: 500,
+		maxHeight: 600,
 		alignItems: "center",
-		justifyContent: "flex-start",
-	},
-	profileContainerHeader: {
-		fontSize: 20,
-		marginBottom: 16,
 	},
 	profileImage: {
 		width: 160,
@@ -118,11 +114,8 @@ const styles = StyleSheet.create({
 		height: 30,
 	},
 	historyColumn: {
-		height: 2000,
-		// flex: 1,
-		// flexDirection: "column",
-		// overflowY: "auto",
-		// minHeight: 0,
+		flex: 3,
+		alignSelf: "flex-end",
+		maxWidth: 550,
 	},
-	historyHeader: { fontSize: 20, marginTop: 20, marginBottom: 20 },
 });
