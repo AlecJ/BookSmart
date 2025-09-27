@@ -1,4 +1,4 @@
-import BookRow from "@/components/bookRow";
+import ProfileBookRow from "@/components/bookRowProfile";
 import { BookType } from "@/types";
 import {
 	FlatList,
@@ -58,7 +58,9 @@ export default function ProfileScreen() {
 					<FlatList
 						style={{ flex: 1, minHeight: 0 }}
 						data={books}
-						renderItem={({ item }) => <BookRow book={item} />}
+						renderItem={({ item }) => (
+							<ProfileBookRow book={item} />
+						)}
 						keyExtractor={(item, index) => index.toString()}
 						showsVerticalScrollIndicator
 					/>
