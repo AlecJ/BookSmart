@@ -5,7 +5,7 @@ export default function SearchScreen() {
 		<View style={styles.container}>
 			<Text style={styles.text}>Search Screen</Text>
 			<Text style={styles.text}>Search Bar</Text>
-			<Text style={styles.text}>Results</Text>
+			<Text style={styles.text}>Search Results</Text>
 		</View>
 	);
 }
