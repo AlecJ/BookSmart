@@ -13,6 +13,7 @@ type Props = {
 	onPress?: () => void;
 	style?: ViewStyle;
 	book: BookType;
+	disableInteract?: boolean;
 };
 
 export default function Book({
@@ -21,46 +22,56 @@ export default function Book({
 	style,
 	book,
 	showProgressBar,
+	disableInteract,
 }: Props) {
 	const [isHovered, setIsHovered] = useState<boolean>(false);
 
-	return (
+	const content = (
 		<>
-			<Pressable
-				onPress={onPress}
-				onHoverIn={() => setIsHovered(true)}
-				onHoverOut={() => setIsHovered(false)}
-				style={style}
-			>
-				<Image
-					source={book.imgSrc ? book.imgSrc : placeholderImage}
-					style={[
-						style,
-						styles.book,
-						{
-							opacity: isHovered ? 0.7 : 1,
-						},
-					]}
-					transition={200}
-				/>
-				{showProgressBar && book.progress ? (
-					<View style={styles.progressBarContainer}>
-						<ProgressBar fillPercent={book.progress} />
-					</View>
-				) : null}
-				{/* </Pressable> */}
-				{showContinueBtn ? (
-					<View style={styles.continueBtn}>
-						<Text style={styles.continueBtnLabel}>Continue</Text>
-						<Ionicons
-							name={"arrow-forward-circle-outline"}
-							color={"#0e162d"}
-							size={20}
-						/>
-					</View>
-				) : null}
-			</Pressable>
+			<Image
+				source={book.imgSrc ? book.imgSrc : placeholderImage}
+				style={[
+					style,
+					styles.book,
+					{
+						opacity: isHovered ? 0.7 : 1,
+					},
+				]}
+				transition={200}
+			/>
+
+			{showProgressBar && book.progress ? (
+				<View style={styles.progressBarContainer}>
+					<ProgressBar fillPercent={book.progress} />
+				</View>
+			) : null}
+
+			{showContinueBtn ? (
+				<View style={styles.continueBtn}>
+					<Text style={styles.continueBtnLabel}>Continue</Text>
+					<Ionicons
+						name={"arrow-forward-circle-outline"}
+						color={"#0e162d"}
+						size={20}
+					/>
+				</View>
+			) : null}
 		</>
+	);
+
+	if (disableInteract) {
+		return <View style={style}>{content}</View>;
+	}
+
+	return (
+		<Pressable
+			onPress={onPress}
+			onHoverIn={() => setIsHovered(true)}
+			onHoverOut={() => setIsHovered(false)}
+			style={style}
+		>
+			{content}
+		</Pressable>
 	);
 }
 
