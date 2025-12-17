@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>React Test</title>
+	</head>
+	<body>
+		<div id="root"></div>
+
+		<!-- React and ReactDOM from CDN -->
+		<script
+			crossorigin
+			src="https://unpkg.com/react@18/umd/react.development.js"
+		></script>
+		<script
+			crossorigin
+			src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+		></script>
+
+		<!-- Babel Standalone for JSX transformation -->
+		<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+		<!-- Your React component -->
+		<script type="text/babel">
+			function OrderBookButton() {
+				function handleClick() {
+					alert("Order placed!");
+				}
+
+				return <button onClick={handleClick}>Order Book</button>;
+			}
+
+			const products = [
+				{ title: "Lord of the Rings", price: 20.99, genre: "Fantasy" },
+				{ title: "1984", price: 15.99, genre: "Dystopian" },
+				{
+					title: "To Kill a Mockingbird",
+					price: 18.99,
+					genre: "Classic",
+				},
+				{ title: "The Great Gatsby", price: 14.99, genre: "Classic" },
+				{ title: "The Hobbit", price: 22.99, genre: "Fantasy" },
+			];
+
+			function BookList() {
+				const listBooks = products.map((book, index) => (
+					<li key={index}>
+						<p>
+							{book.title} - ${book.price} ({book.genre})
+						</p>
+						<OrderBookButton />
+					</li>
+				));
+
+				return (
+					<>
+						<h1>test</h1>
+						<ul>{listBooks}</ul>
+					</>
+				);
+			}
+
+			const root = ReactDOM.createRoot(document.getElementById("root"));
+			root.render(<BookList />);
+		</script>
+	</body>
+</html>
