@@ -1,10 +1,12 @@
 import Book from "@/components/book";
 import ChapterBtn from "@/components/chapterBtn";
 import { Link, useLocalSearchParams } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function BookDetailsScreen() {
 	const { bookId } = useLocalSearchParams();
+
+	const isWeb = Platform.OS === "web";
 
 	const book = {
 		name: "Letters_to_a_Young_Chef",
@@ -31,22 +33,24 @@ export default function BookDetailsScreen() {
 			href={`/read/${bookId}/chapters/${chapter.id}`}
 		>
 			<ChapterBtn
-				style={styles.chapterBtn}
+				style={isWeb ? styles.chapterBtnWeb : styles.chapterBtn}
 				title={chapter.title}
 				status={chapter.status}
 			/>
 		</Link>
 	));
 
-	return (
-		<View style={styles.container}>
+	const content = (
+		<>
 			<View style={styles.header}>
-				<Book
-					style={styles.bookCover}
-					book={book}
-					disableInteract
-					showGradient
-				/>
+				{isWeb && (
+					<Book
+						style={styles.bookCover}
+						book={book}
+						disableInteract
+						showGradient
+					/>
+				)}
 				<View style={styles.bookInfo}>
 					<Text style={[styles.text, styles.bookTitle]}>
 						{book.prettyName}
@@ -54,18 +58,37 @@ export default function BookDetailsScreen() {
 					<Text style={[styles.text, styles.authorText]}>
 						{book.author}
 					</Text>
-					<Text style={[styles.text, styles.descriptionText]}>
+					<Text
+						style={[styles.text, styles.descriptionText]}
+						numberOfLines={10}
+						ellipsizeMode="head"
+					>
 						{book.description}
 					</Text>
 				</View>
 			</View>
 			<Text style={[styles.text, styles.chapterHeading]}>Chapters</Text>
 			<View style={styles.chapterList}>{chapterList}</View>
-		</View>
+		</>
+	);
+
+	return isWeb ? (
+		<View style={styles.container}>{content}</View>
+	) : (
+		<ScrollView
+			style={styles.scrollView}
+			contentContainerStyle={styles.container}
+		>
+			{content}
+		</ScrollView>
 	);
 }
 
 const styles = StyleSheet.create({
+	scrollView: {
+		width: "100%",
+		backgroundColor: "#f1e9d2",
+	},
 	container: {
 		width: "100%",
 		backgroundColor: "#f1e9d2",
@@ -75,18 +98,19 @@ const styles = StyleSheet.create({
 	header: {
 		width: "100%",
 		marginTop: 20,
-		height: 300,
+		// height: 300,
 		flexDirection: "row",
 	},
 	bookCover: {
 		flex: 1,
 		width: "20%",
+		height: 300,
 	},
 	bookInfo: {
 		flex: 1,
 		padding: 10,
-		// borderWidth: 2,
-		// borderColor: "red",
+		justifyContent: "center",
+		maxHeight: 300,
 	},
 	chapterList: {
 		width: "100%",
@@ -97,6 +121,12 @@ const styles = StyleSheet.create({
 		padding: 10,
 	},
 	chapterBtn: {
+		width: "100%",
+		height: 75,
+		padding: 0,
+		margin: 0,
+	},
+	chapterBtnWeb: {
 		width: "49%",
 		height: 75,
 		padding: 0,
