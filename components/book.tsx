@@ -2,6 +2,7 @@ import ProgressBar from "@/components/progressBar";
 import { BookType } from "@/types";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
 
@@ -10,6 +11,7 @@ const placeholderImage = require("@/assets/images/book-cover-placeholder.png");
 type Props = {
 	showContinueBtn?: boolean;
 	showProgressBar?: boolean;
+	showGradient?: boolean;
 	onPress?: () => void;
 	style?: ViewStyle;
 	book: BookType;
@@ -22,23 +24,54 @@ export default function Book({
 	style,
 	book,
 	showProgressBar,
+	showGradient,
 	disableInteract,
 }: Props) {
 	const [isHovered, setIsHovered] = useState<boolean>(false);
 
 	const content = (
 		<>
-			<Image
-				source={book.imgSrc ? book.imgSrc : placeholderImage}
-				style={[
-					style,
-					styles.book,
-					{
-						opacity: isHovered ? 0.7 : 1,
-					},
-				]}
-				transition={200}
-			/>
+			<View style={[styles.imageContainer]}>
+				<Image
+					source={book.imgSrc ? book.imgSrc : placeholderImage}
+					style={[
+						style,
+						styles.book,
+						{
+							opacity: isHovered ? 0.7 : 1,
+						},
+					]}
+					transition={200}
+				/>
+
+				{showGradient && (
+					<>
+						<LinearGradient
+							colors={[
+								"#f1e9d2",
+								"rgba(241, 233, 210, 0.5)",
+								"rgba(241, 233, 210, 0.2)",
+								"transparent",
+							]}
+							locations={[0, 0.3, 0.6, 1]}
+							style={styles.fadeTop}
+							pointerEvents="none"
+						/>
+
+						<LinearGradient
+							colors={[
+								"transparent",
+								"rgba(241, 233, 210, 0.2)",
+								"rgba(241, 233, 210, 0.5)",
+								"#f1e9d2",
+							]}
+							locations={[0, 0.4, 0.7, 1]}
+							style={styles.fadeBottom}
+							pointerEvents="none"
+						/>
+					</>
+				)}
+			</View>
 
 			{showProgressBar && book.progress ? (
 				<View style={styles.progressBarContainer}>
@@ -76,6 +109,11 @@ export default function Book({
 }
 
 const styles = StyleSheet.create({
+	imageContainer: {
+		width: "100%",
+		height: "100%",
+		position: "relative",
+	},
 	book: {
 		width: "100%",
 		height: "100%",
@@ -100,5 +138,19 @@ const styles = StyleSheet.create({
 	},
 	continueBtnLabel: {
 		fontSize: 16,
+	},
+	fadeTop: {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		height: 60,
+	},
+	fadeBottom: {
+		position: "absolute",
+		bottom: 0,
+		left: 0,
+		right: 0,
+		height: 60,
 	},
 });

@@ -8,6 +8,10 @@ export default function BookDetailsScreen() {
 
 	const book = {
 		name: "Letters_to_a_Young_Chef",
+		prettyName: "Letters to a Young Chef",
+		author: "Daniel Boulud",
+		description:
+			"A heartfelt collection of letters from renowned chef Daniel Boulud to aspiring chefs, offering wisdom, inspiration, and insights into the culinary world.",
 		imgSrc: require("@/assets/images/LettersToAYoungChef.jpg"),
 		progress: 0.75,
 	};
@@ -24,21 +28,32 @@ export default function BookDetailsScreen() {
 			asChild
 			href={`/read/${bookId}/chapters/${chapter.id}`}
 		>
-			<ChapterBtn title={chapter.title} />
+			<ChapterBtn style={styles.chapterBtn} title={chapter.title} />
 		</Link>
 	));
 
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
-				<Book style={styles.bookCover} book={book} disableInteract />
+				<Book
+					style={styles.bookCover}
+					book={book}
+					disableInteract
+					showGradient
+				/>
 				<View style={styles.bookInfo}>
-					<Text style={styles.text}>Book Details Screen</Text>
-					<Text style={styles.text}>Book Title: {bookId}</Text>
-					<Text style={styles.text}>Author</Text>
-					<Text style={styles.text}>Description</Text>
+					<Text style={[styles.text, styles.bookTitle]}>
+						{book.prettyName}
+					</Text>
+					<Text style={[styles.text, styles.authorText]}>
+						{book.author}
+					</Text>
+					<Text style={[styles.text, styles.descriptionText]}>
+						{book.description}
+					</Text>
 				</View>
 			</View>
+			<Text style={[styles.text, styles.chapterHeading]}>Chapters</Text>
 			<View style={styles.chapterList}>{chapterList}</View>
 		</View>
 	);
@@ -53,26 +68,58 @@ const styles = StyleSheet.create({
 	},
 	header: {
 		width: "100%",
-		height: 200,
-		borderWidth: 2,
-		borderColor: "red",
+		height: 300,
 		flexDirection: "row",
 	},
 	bookCover: {
 		flex: 1,
+		width: "20%",
 	},
 	bookInfo: {
 		flex: 1,
+		padding: 10,
+		// borderWidth: 2,
+		// borderColor: "red",
 	},
 	chapterList: {
-		flex: 1,
+		width: "100%",
 		flexDirection: "row",
 		flexWrap: "wrap",
-		justifyContent: "center",
+		justifyContent: "flex-start",
 		gap: 10,
 		padding: 10,
 	},
+	chapterBtn: {
+		width: "49%",
+		height: 75,
+		padding: 0,
+		margin: 0,
+	},
 	text: {
 		color: "#0e162d",
+	},
+	bookTitle: {
+		alignSelf: "center",
+		fontSize: 30,
+		fontWeight: 400,
+		marginTop: 10,
+	},
+	authorText: {
+		alignSelf: "center",
+		fontSize: 20,
+		fontWeight: 300,
+		marginTop: 10,
+	},
+	descriptionText: {
+		fontSize: 18,
+		fontWeight: 300,
+		marginTop: 10,
+		textIndent: "30px",
+		textAlign: "center",
+	},
+	chapterHeading: {
+		fontSize: 24,
+		fontWeight: 200,
+		marginTop: 10,
 	},
 });
