@@ -1,30 +1,43 @@
-import {
-	Image,
-	Pressable,
-	PressableProps,
-	StyleSheet,
-	Text,
-} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { Pressable, PressableProps, StyleSheet, Text } from "react-native";
 
 type Props = {
 	title: string;
+	status: string;
 	style: PressableProps["style"];
 };
 
-const incompleteCircle = require("@/assets/images/incomplete-circle.png");
-const failedCircle = require("@/assets/images/failed-circle.png");
-const partialCompleteCircle = require("@/assets/images/partial-complete-circle.png");
-const passedCircle = require("@/assets/images/passed-circle.png");
+enum Status {
+	INCOMPLETE = "incomplete",
+	FAILED = "failed",
+	PARTIAL_COMPLETE = "partial_complete",
+	COMPLETE = "complete",
+}
+
+const STATUS_ICON_MAP: Record<Status, keyof typeof Ionicons.glyphMap> = {
+	[Status.INCOMPLETE]: { name: "ellipse-outline", color: "" },
+	[Status.FAILED]: { name: "close-circle", color: "#f53636ff" },
+	[Status.PARTIAL_COMPLETE]: { name: "checkmark-circle", color: "#e5ab17ff" },
+	[Status.COMPLETE]: { name: "checkmark-circle", color: "#14af1eff" },
+};
 
 export default function ChapterBtn({
 	title,
+	status,
 	style,
 	...props
 }: PressableProps & Props) {
+	const icon = STATUS_ICON_MAP[status];
+
 	return (
 		<Pressable style={[styles.container, style]} {...props}>
 			<Text style={styles.chapterTitleText}>{title}</Text>
-			<Image style={styles.chapterBtnIcon} source={incompleteCircle} />
+			<Ionicons
+				style={styles.chapterBtnIcon}
+				name={icon.name}
+				size={30}
+				color={icon.color}
+			/>
 		</Pressable>
 	);
 }
@@ -44,8 +57,6 @@ const styles = StyleSheet.create({
 		color: "#000",
 	},
 	chapterBtnIcon: {
-		width: 25,
-		height: 25,
 		position: "absolute",
 		right: 25,
 	},

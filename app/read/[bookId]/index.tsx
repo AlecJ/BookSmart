@@ -17,9 +17,11 @@ export default function BookDetailsScreen() {
 	};
 
 	const chapters = [
-		{ id: 1, title: "Chapter 1", completed: true },
-		{ id: 2, title: "Chapter 2", completed: true },
-		{ id: 3, title: "Chapter 3", completed: false },
+		{ id: 1, title: "Chapter 1", status: "complete" },
+		{ id: 2, title: "Chapter 2", status: "failed" },
+		{ id: 3, title: "Chapter 3", status: "partial_complete" },
+		{ id: 4, title: "Chapter 4", status: "partial_complete" },
+		{ id: 5, title: "Chapter 5", status: "incomplete" },
 	];
 
 	const chapterList = chapters.map((chapter) => (
@@ -28,7 +30,11 @@ export default function BookDetailsScreen() {
 			asChild
 			href={`/read/${bookId}/chapters/${chapter.id}`}
 		>
-			<ChapterBtn style={styles.chapterBtn} title={chapter.title} />
+			<ChapterBtn
+				style={styles.chapterBtn}
+				title={chapter.title}
+				status={chapter.status}
+			/>
 		</Link>
 	));
 
@@ -68,6 +74,7 @@ const styles = StyleSheet.create({
 	},
 	header: {
 		width: "100%",
+		marginTop: 20,
 		height: 300,
 		flexDirection: "row",
 	},
@@ -120,6 +127,6 @@ const styles = StyleSheet.create({
 	chapterHeading: {
 		fontSize: 24,
 		fontWeight: 200,
-		marginTop: 10,
+		marginTop: 30,
 	},
 });
