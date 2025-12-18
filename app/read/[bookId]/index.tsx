@@ -1,30 +1,31 @@
 import Book from "@/components/book";
 import ChapterBtn from "@/components/chapterBtn";
 import { Link, useLocalSearchParams } from "expo-router";
-import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+	ActivityIndicator,
+	Platform,
+	ScrollView,
+	StyleSheet,
+	Text,
+	View,
+} from "react-native";
+import { useBook } from "./_layout";
 
 export default function BookDetailsScreen() {
 	const { bookId } = useLocalSearchParams();
+	const { book } = useBook();
+	const chapters = book?.chapters || [];
 
 	const isWeb = Platform.OS === "web";
 
-	const book = {
-		name: "Letters_to_a_Young_Chef",
-		prettyName: "Letters to a Young Chef",
-		author: "Daniel Boulud",
-		description:
-			"A heartfelt collection of letters from renowned chef Daniel Boulud to aspiring chefs, offering wisdom, inspiration, and insights into the culinary world.",
-		imgSrc: require("@/assets/images/LettersToAYoungChef.jpg"),
-		progress: 0.75,
-	};
-
-	const chapters = [
-		{ id: 1, title: "Chapter 1", status: "complete" },
-		{ id: 2, title: "Chapter 2", status: "failed" },
-		{ id: 3, title: "Chapter 3", status: "partial_complete" },
-		{ id: 4, title: "Chapter 4", status: "partial_complete" },
-		{ id: 5, title: "Chapter 5", status: "incomplete" },
-	];
+	// Show loading indicator while book is being fetched
+	if (!book) {
+		return (
+			<View style={[styles.container, styles.loadingContainer]}>
+				<ActivityIndicator size="large" color="#0e162d" />
+			</View>
+		);
+	}
 
 	const chapterList = chapters.map((chapter) => (
 		<Link
@@ -89,6 +90,11 @@ const styles = StyleSheet.create({
 		width: "100%",
 		backgroundColor: "#f1e9d2",
 	},
+	loadingContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+	},
 	container: {
 		width: "100%",
 		backgroundColor: "#f1e9d2",
@@ -98,7 +104,6 @@ const styles = StyleSheet.create({
 	header: {
 		width: "100%",
 		marginTop: 20,
-		// height: 300,
 		flexDirection: "row",
 	},
 	bookCover: {
