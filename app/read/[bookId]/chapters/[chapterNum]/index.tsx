@@ -1,3 +1,4 @@
+import { useBook } from "@/app/read/[bookId]/_layout";
 import ChapterBtn from "@/components/chapterBtn";
 import { Link, useLocalSearchParams } from "expo-router";
 import {
@@ -8,7 +9,6 @@ import {
 	Text,
 	View,
 } from "react-native";
-import { useBook } from "../../_layout";
 
 export default function BookDetailsScreen() {
 	const { chapterNum } = useLocalSearchParams();
@@ -96,10 +96,11 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		marginTop: 20,
 		gap: 10,
+		marginBottom: 20,
 	},
 	questionBtn: {
 		width: "90%",
 		maxWidth: 600,
-		height: 70,
+		minHeight: 70,
 	},
 });

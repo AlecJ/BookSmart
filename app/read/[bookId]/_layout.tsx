@@ -67,9 +67,22 @@ export default function BookLayout() {
 						title: "Chapter 1",
 						status: "complete",
 						questions: [
-							{ id: 1, text: "Question 1", status: "complete" },
-							{ id: 2, text: "Question 2", status: "complete" },
-							{ id: 3, text: "Question 3", status: "complete" },
+							{
+								id: 1,
+								text: "How does Boulud describe the role of discipline and routine in his early culinary training, and why does he see them as foundational rather than restrictive?",
+								status: "complete",
+								response: "Yes!",
+							},
+							{
+								id: 2,
+								text: "What influence did mentors and the kitchen hierarchy have on shaping Boulud’s values as a young chef, and what does this suggest about how culinary knowledge is passed down?",
+								status: "complete",
+							},
+							{
+								id: 3,
+								text: "How does Boulud frame the relationship between humility and ambition, and why does he argue that both are necessary for long-term success in the kitchen?",
+								status: "complete",
+							},
 						],
 					},
 					{

@@ -45,7 +45,7 @@ export default function ChapterBtn({
 const styles = StyleSheet.create({
 	container: {
 		width: 150,
-		height: 60,
+		minHeight: 60,
 		backgroundColor: "#ccc",
 		justifyContent: "center",
 		alignItems: "center",
@@ -53,8 +53,11 @@ const styles = StyleSheet.create({
 	},
 	chapterTitleText: {
 		fontSize: 20,
-		fontWeight: 250,
+		fontWeight: 300,
 		color: "#000",
+		padding: 25,
+		paddingRight: 70,
+		flexWrap: "wrap",
 	},
 	chapterBtnIcon: {
 		position: "absolute",
