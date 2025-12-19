@@ -1,6 +1,13 @@
 import ChapterBtn from "@/components/chapterBtn";
 import { Link, useLocalSearchParams } from "expo-router";
-import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+	ActivityIndicator,
+	Platform,
+	ScrollView,
+	StyleSheet,
+	Text,
+	View,
+} from "react-native";
 import { useBook } from "../../_layout";
 
 export default function BookDetailsScreen() {
@@ -8,20 +15,22 @@ export default function BookDetailsScreen() {
 	const { book, getChapter } = useBook();
 	const questions = getChapter(Number(chapterNum))?.questions || [];
 
-	const isWeb = Platform.OS === "web";
+	// Show loading indicator while book is being fetched
+	if (!book) {
+		return (
+			<View style={[styles.container, styles.loadingContainer]}>
+				<ActivityIndicator size="large" color="#0e162d" />
+			</View>
+		);
+	}
 
-	// const questions = [
-	// 	{ id: 1, text: "Question 1", status: "complete" },
-	// 	{ id: 2, text: "Question 2", status: "failed" },
-	// 	{ id: 3, text: "Question 3", status: "partial_complete" },
-	// 	{ id: 4, text: "Question 4", status: "incomplete" },
-	// ];
+	const isWeb = Platform.OS === "web";
 
 	const questionList = questions.map((question) => (
 		<Link
 			key={question.id}
 			asChild
-			href={isWeb ? `./${chapterNum}/question/${question.id}` : `..`}
+			href={`./${chapterNum}/question/${question.id}`}
 		>
 			<ChapterBtn
 				style={styles.questionBtn}

@@ -91,7 +91,6 @@ const styles = StyleSheet.create({
 		backgroundColor: "#f1e9d2",
 	},
 	loadingContainer: {
-		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
 	},

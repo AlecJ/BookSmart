@@ -1,5 +1,7 @@
+import NavBar from "@/components/navbar";
 import { Slot, useLocalSearchParams } from "expo-router";
 import { createContext, useContext, useEffect, useState } from "react";
+import { Platform } from "react-native";
 
 type Book = {
 	name: string;
@@ -51,13 +53,12 @@ export default function BookLayout() {
 		// Fetch your book data here
 		// For now, using mock data
 		const fetchBook = async () => {
-			// 		"A heartfelt collection of letters from renowned chef Daniel Boulud to aspiring chefs, offering wisdom, inspiration, and insights into the culinary world.",
-
 			const bookData = {
 				name: "Letters_to_a_Young_Chef",
 				prettyName: "Letters to a Young Chef",
 				author: "Daniel Boulud",
-				description: "A heartfelt collection...",
+				description:
+					"A heartfelt collection of letters from renowned chef Daniel Boulud to aspiring chefs, offering wisdom, inspiration, and insights into the culinary world.",
 				imgSrc: require("@/assets/images/LettersToAYoungChef.jpg"),
 				progress: 0.75,
 				chapters: [
@@ -68,7 +69,7 @@ export default function BookLayout() {
 						questions: [
 							{ id: 1, text: "Question 1", status: "complete" },
 							{ id: 2, text: "Question 2", status: "complete" },
-							{ id: 2, text: "Question 2", status: "complete" },
+							{ id: 3, text: "Question 3", status: "complete" },
 						],
 					},
 					{
@@ -78,7 +79,7 @@ export default function BookLayout() {
 						questions: [
 							{ id: 1, text: "Question 1", status: "failed" },
 							{ id: 2, text: "Question 2", status: "failed" },
-							{ id: 2, text: "Question 2", status: "failed" },
+							{ id: 3, text: "Question 3", status: "failed" },
 						],
 					},
 					{
@@ -88,7 +89,7 @@ export default function BookLayout() {
 						questions: [
 							{ id: 1, text: "Question 1", status: "complete" },
 							{ id: 2, text: "Question 2", status: "failed" },
-							{ id: 2, text: "Question 2", status: "complete" },
+							{ id: 3, text: "Question 3", status: "complete" },
 						],
 					},
 					{
@@ -98,7 +99,7 @@ export default function BookLayout() {
 						questions: [
 							{ id: 1, text: "Question 1", status: "complete" },
 							{ id: 2, text: "Question 2", status: "failed" },
-							{ id: 2, text: "Question 2", status: "incomplete" },
+							{ id: 3, text: "Question 3", status: "incomplete" },
 						],
 					},
 					{
@@ -108,7 +109,7 @@ export default function BookLayout() {
 						questions: [
 							{ id: 1, text: "Question 1", status: "incomplete" },
 							{ id: 2, text: "Question 2", status: "incomplete" },
-							{ id: 2, text: "Question 2", status: "incomplete" },
+							{ id: 3, text: "Question 3", status: "incomplete" },
 						],
 					},
 				],
@@ -129,8 +130,11 @@ export default function BookLayout() {
 		);
 	};
 
+	const isWeb = Platform.OS === "web";
+
 	return (
 		<BookContext.Provider value={{ book, getChapter, getQuestion }}>
+			{isWeb && !!book && <NavBar />}
 			<Slot />
 		</BookContext.Provider>
 	);

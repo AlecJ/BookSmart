@@ -7,8 +7,11 @@ Back End: FastAPI, PostgreSQL
 
 ## To Do
 
--   Finish pages outline
--   Home page shows bookshelf with recent books
+-   split view, test web with small screensize
+-   test very big resolution
+
+## Future Work
+
 -   placeholder book covers should be generated with title (and random color)
 
 ...

@@ -1,9 +1,17 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Tabs } from "expo-router";
-import { StyleSheet } from "react-native";
+import { Slot, Tabs } from "expo-router";
+import { Platform, StyleSheet, View } from "react-native";
 
 export default function TabLayout() {
-	const isQuestionReviewed = false;
+	const questionHasFeedback = true;
+
+	if (Platform.OS === "web") {
+		return (
+			<View>
+				<Slot />
+			</View>
+		);
+	}
 
 	return (
 		<Tabs screenOptions={tabsScreenOptions}>
@@ -20,11 +28,11 @@ export default function TabLayout() {
 					),
 				}}
 			/>
-			{isQuestionReviewed ? (
+			{questionHasFeedback ? (
 				<Tabs.Screen
-					name="result"
+					name="feedback"
 					options={{
-						title: "Search",
+						title: "Feedback",
 						tabBarIcon: ({ color, focused }) => (
 							<Ionicons
 								name={
@@ -40,9 +48,9 @@ export default function TabLayout() {
 				/>
 			) : (
 				<Tabs.Screen
-					name="result"
+					name="feedback"
 					options={{
-						title: "Search",
+						title: "Feedback",
 						tabBarIcon: ({ color, focused }) => (
 							<Ionicons
 								name={
