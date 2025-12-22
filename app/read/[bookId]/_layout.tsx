@@ -1,38 +1,16 @@
 import NavBar from "@/components/navbar";
+import { BookChapterType, BookQuestionType, BookType } from "@/types";
 import { Slot, useLocalSearchParams } from "expo-router";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Platform } from "react-native";
 
-type Book = {
-	name: string;
-	prettyName: string;
-	author: string;
-	description: string;
-	imgSrc: any;
-	progress: number;
-	chapters?: Chapter[];
-};
-
-type Chapter = {
-	id: number;
-	title: string;
-	status: string;
-	questions?: Question[];
-};
-
-type Question = {
-	id: number;
-	text: string;
-	status: string;
-};
-
 type BookContextType = {
-	book: Book | null;
-	getChapter: (chapterNum: number) => Chapter | undefined;
+	book: BookType | null;
+	getChapter: (chapterNum: number) => BookChapterType | undefined;
 	getQuestion: (
 		chapterNum: number,
 		questionNum: number
-	) => Question | undefined;
+	) => BookQuestionType | undefined;
 };
 
 const BookContext = createContext<BookContextType | undefined>(undefined);
@@ -47,7 +25,7 @@ export function useBook() {
 
 export default function BookLayout() {
 	const { bookId } = useLocalSearchParams();
-	const [book, setBook] = useState<Book | null>(null);
+	const [book, setBook] = useState<BookType | null>(null);
 
 	useEffect(() => {
 		// Fetch your book data here
@@ -71,7 +49,7 @@ export default function BookLayout() {
 								id: 1,
 								text: "How does Boulud describe the role of discipline and routine in his early culinary training, and why does he see them as foundational rather than restrictive?",
 								status: "complete",
-								response: "Yes!",
+								userResponse: "Yes!",
 							},
 							{
 								id: 2,

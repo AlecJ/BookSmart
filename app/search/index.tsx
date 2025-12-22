@@ -1,11 +1,43 @@
-import { StyleSheet, Text, View } from "react-native";
+import SearchResultsList from "@/components/searchResultsList";
+import { StyleSheet, View } from "react-native";
 
 export default function SearchScreen() {
+	const mockResults = [
+		{
+			name: "Letters_to_a_Young_Chef",
+			prettyName: "Letters to a Young Chef",
+			author: "Daniel Boulud",
+			description:
+				"A heartfelt collection of letters from renowned chef Daniel Boulud to aspiring chefs, offering wisdom, inspiration, and insights into the culinary world.",
+			imgSrc: require("@/assets/images/LettersToAYoungChef.jpg"),
+			progress: 0.75,
+			chapters: [],
+		},
+		{
+			name: "Letters_to_a_Young_Chef",
+			prettyName: "Letters to a Young Chef",
+			author: "Daniel Boulud",
+			description:
+				"A heartfelt collection of letters from renowned chef Daniel Boulud to aspiring chefs, offering wisdom, inspiration, and insights into the culinary world.",
+			imgSrc: require("@/assets/images/LettersToAYoungChef.jpg"),
+			progress: 0.75,
+			chapters: [],
+		},
+		{
+			name: "Letters_to_a_Young_Chef",
+			prettyName: "Letters to a Young Chef",
+			author: "Daniel Boulud",
+			description:
+				"A heartfelt collection of letters from renowned chef Daniel Boulud to aspiring chefs, offering wisdom, inspiration, and insights into the culinary world.",
+			imgSrc: require("@/assets/images/LettersToAYoungChef.jpg"),
+			progress: 0.75,
+			chapters: [],
+		},
+	];
+
 	return (
 		<View style={styles.container}>
-			<Text style={styles.text}>Search Screen</Text>
-			<Text style={styles.text}>Search Bar</Text>
-			<Text style={styles.text}>Search Results</Text>
+			<SearchResultsList results={mockResults} />
 		</View>
 	);
 }

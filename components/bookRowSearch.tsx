@@ -1,13 +1,14 @@
 import BookRow from "@/components/bookRow";
 import { BookType } from "@/types";
-import { StyleSheet } from "react-native";
+import { StyleSheet, ViewStyle } from "react-native";
 
 type Props = {
 	book: BookType;
+	style?: ViewStyle;
 };
 
-export default function SearchBookRow({ book }: Props) {
-	return <BookRow book={book} style={styles.searchBookRow} />;
+export default function SearchBookRow({ book, style }: Props) {
+	return <BookRow book={book} style={[styles.searchBookRow, style]} />;
 }
 
 const styles = StyleSheet.create({
