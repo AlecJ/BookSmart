@@ -16,6 +16,7 @@ export default function BookRow({ book, style }: Props) {
 					height: 96,
 					aspectRatio: 2 / 3,
 				}}
+				disableInteract
 			></Book>
 			<View style={styles.bookDetails}>
 				<Text style={styles.bookTitle}>
@@ -24,10 +25,10 @@ export default function BookRow({ book, style }: Props) {
 				<Text>by {book.author}</Text>
 			</View>
 
-			<View style={styles.bookProgress}>
+			{/* <View style={styles.bookProgress}>
 				<Text>Progress</Text>
 				<Text>{book.progress ? book.progress * 100 + "%" : "0%"}</Text>
-			</View>
+			</View> */}
 		</View>
 	);
 }

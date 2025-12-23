@@ -7,7 +7,7 @@ export interface BookType {
 	description?: string;
 	imgSrc?: ImageSourcePropType;
 	progress?: number;
-	chapters: BookChapterType[];
+	chapters?: BookChapterType[];
 }
 
 export interface BookChapterType {

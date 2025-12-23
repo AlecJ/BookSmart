@@ -1,5 +1,5 @@
 import { BookType } from "@/types";
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import BookRowSearch from "@/components/bookRowSearch";
 
@@ -8,11 +8,13 @@ type Props = { results: BookType[] };
 export default function SearchResultsList({ results }: Props) {
 	const resultsList = results.map((result, index) => {
 		return (
-			<BookRowSearch
-				key={index}
-				book={result}
-				style={index % 2 === 0 ? styles.evenRow : styles.oddRow}
-			/>
+			<Pressable key={index} href={`./search/${result.name}`}>
+				<BookRowSearch
+					key={index}
+					book={result}
+					style={index % 2 === 0 ? styles.evenRow : styles.oddRow}
+				/>
+			</Pressable>
 		);
 	});
 
@@ -24,6 +26,7 @@ const styles = StyleSheet.create({
 		width: "100%",
 		marginTop: 20,
 		alignItems: "center",
+		gap: 2,
 	},
 	evenRow: {
 		backgroundColor: "rgba(236, 211, 168, 1)",
