@@ -7,7 +7,14 @@ Back End: FastAPI, PostgreSQL
 
 ## To Do
 
--   split view, test web with small screensize
+Routes:
+GET /api/v1/search -- perform search and return results
+GET /api/v1/read -- get users books
+POST /api/v1/read/{bookId} -- add book to user's library
+DEL /api/v1/read/{bookId} -- remove a book from a user's library
+GET /api/v1/read/{bookId} -- get book details/questions/chapters for user for one book
+POST /api/v1/read{bookId}/submit -- post users answers to questions and fetch feedback
+
 -   test very big resolution
 
 ## Future Work
