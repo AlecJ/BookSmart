@@ -1,0 +1,13 @@
+Generic single-database configuration.
+
+## Useful Commands
+
+-   Create a db migration
+    `alembic revision --autogenerate -m "message"`
+    or with docker
+    `docker compose exec backend alembic revision --autogenerate -m "message"`
+
+-   Apply a db migration
+    `alembic upgrade head`
+    or with docker
+    `docker compose exec backend alembic upgrade head`
