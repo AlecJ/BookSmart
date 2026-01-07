@@ -11,4 +11,5 @@ dependencies = [
     "alembic>=1.13.3",
     "pydantic>=2.10.4",
     "pydantic-settings>=2.7.0",
+    "openai>=2.14.0",
 ]
