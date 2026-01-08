@@ -71,18 +71,18 @@ def get_book_chapters(*, session: Session) -> list[Book]:
     return books
 
 
-def get_book_chapter_by_id(*, session: Session, book_chapter_id: int) -> BookChapter | None:
-    statement = select(BookChapter).where(BookChapter.id == book_chapter_id)
+def get_book_chapter_by_id(*, session: Session, chapter_id: int) -> BookChapter | None:
+    statement = select(BookChapter).where(BookChapter.id == chapter_id)
     book = session.exec(statement).first()
     return book
 
 
-def update_book():
-    pass
+# def update_book():
+#     pass
 
 
-def delete_book():
-    pass
+# def delete_book():
+#     pass
 
 # endregion BookChapterCRUD
 

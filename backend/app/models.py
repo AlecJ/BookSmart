@@ -89,3 +89,9 @@ class UserResponse(SQLModel, table=True):
     response_text: str = Field()
     feedback_text: str = Field()
     feedback_grade: int = Field()  # 0 = incorrect, 1 = partially correct, 2 = correct
+
+
+class Settings(SQLModel, table=True):
+    key: str = Field(primary_key=True)
+    value: str = Field()
+    data_type: str = Field()  # e.g., 'string', 'integer', 'boolean'

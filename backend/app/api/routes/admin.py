@@ -4,16 +4,16 @@ from sqlalchemy.exc import IntegrityError
 
 from app.api.deps import SessionDep
 from app import crud
-from app.services.openai import generate_response
+from app.services.openai_service import generate_chapter_question
 from app.models import (Book, BookChapter, BookChapterCreate,
                         ChapterQuestionCreate, ChapterQuestion)
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 
-@router.get("/test-openai")
-async def test_openai(prompt: str) -> dict:
-    response = generate_response(prompt)
+@router.get("/make-question")
+async def make_question(*, session: SessionDep, chapter_id: uuid.UUID) -> dict:
+    response = await generate_chapter_question(session=session, chapter_id=chapter_id)
     return {"response": response}
 
 
