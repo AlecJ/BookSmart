@@ -43,20 +43,16 @@
 
 ## To Do
 
--   add openai api
--   prompt
--   add response to db
-
+-   connect frontend to backend
 -   add user auth
 
--   how to get a bunch of books
-
--   connect frontend to backend
 -   test on web
 -   catch ios up to web
 -   polish frontends
 -   test very big resolution
 
+-   how to get a bunch of books
+-   add response to db
 -   seed script
 
 ## Routes

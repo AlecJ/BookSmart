@@ -38,4 +38,6 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-app-example
+# backend
+__pycache__/
+*.pyc

@@ -2,7 +2,7 @@ import uuid
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.exc import IntegrityError
 
-from app.api.deps import SessionDep
+from app.api.deps import SessionDep, CurrentUser
 from app import crud
 from app.services.openai_service import generate_chapter_question
 from app.models import (Book, BookChapter, BookChapterCreate,
