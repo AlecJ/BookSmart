@@ -20,7 +20,7 @@ export default function BookRow({ book, style }: Props) {
 			></Book>
 			<View style={styles.bookDetails}>
 				<Text style={styles.bookTitle}>
-					{book.prettyName || book.name}
+					{book.prettyName || book.name || book.title}
 				</Text>
 				<Text>by {book.author}</Text>
 			</View>

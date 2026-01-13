@@ -1,6 +1,7 @@
 import uuid
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.exc import IntegrityError
+from sqlmodel import select
 
 from app.api.deps import SessionDep, CurrentUser
 from app import crud
@@ -63,8 +64,12 @@ def add_book_to_user_library(*, session: SessionDep, current_user: CurrentUser, 
         raise HTTPException(status_code=404, detail="Book not found")
 
     # Check if the link already exists
-    existing_link = session.get(UserBookLink).filter_by(
-        user_id=user.id, book_id=book.id).first()
+    existing_link = session.exec(
+        select(UserBookLink).where(
+            UserBookLink.user_id == user.id,
+            UserBookLink.book_id == book.id
+        )
+    ).first()
     if existing_link:
         raise HTTPException(
             status_code=400, detail="Book already in user's library")

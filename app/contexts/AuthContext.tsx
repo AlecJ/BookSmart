@@ -9,6 +9,7 @@ interface AuthContextType {
 	isLoading: boolean;
 	isAuthenticated: boolean;
 	login: (email: string, password: string) => Promise<void>;
+	register: (email: string, password: string) => Promise<void>;
 	logout: () => Promise<void>;
 	checkAuth: () => Promise<void>;
 }
@@ -34,8 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 				] = `Bearer ${token}`;
 
 				// Verify token is still valid by fetching user profile
-				// const response = await api.get("/users/me");
-				// setUser(response.data);
+				await api.get("/read");
 				setIsAuthenticated(true);
 			}
 		} catch (error) {
@@ -66,6 +66,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		}
 	};
 
+	const register = async (email: string, password: string) => {
+		try {
+			await userService.register(email, password);
+		} catch (error: any) {
+			console.error("Registration failed:", error);
+			throw new Error(
+				error.response?.data?.detail || "Registration failed"
+			);
+		}
+	};
+
 	const logout = async () => {
 		try {
 			await secureStorage.removeItem(TOKEN_KEY);
@@ -82,6 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 				isLoading,
 				isAuthenticated,
 				login,
+				register,
 				logout,
 				checkAuth,
 			}}

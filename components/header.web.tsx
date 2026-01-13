@@ -1,12 +1,25 @@
+import { useAuth } from "@/app/contexts/AuthContext";
+import { useBooksCtx } from "@/app/contexts/BookContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Link } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
-import { useAuth } from "../app/contexts/AuthContext";
-
-// import { SearchBar } from "react-native-elements";
+import { Link, router } from "expo-router";
+import { useState } from "react";
+import { StyleSheet, Text, TextInput, View } from "react-native";
 
 export default function Header() {
 	const { logout, isAuthenticated } = useAuth();
+	const { searchBooks } = useBooksCtx();
+	const [searchQuery, setSearchQuery] = useState("");
+
+	const handleSearchFocus = () => {
+		router.push("/search");
+	};
+
+	const handleSearchSubmit = async () => {
+		if (searchQuery.trim()) {
+			await searchBooks(searchQuery);
+			router.push("/search");
+		}
+	};
 
 	return (
 		<View style={styles.header}>
@@ -16,13 +29,22 @@ export default function Header() {
 				</Link>
 			</View>
 			<View style={styles.headerSearchBar}>
-				<Link href={`/search`}>
-					<Ionicons
-						name={"search-outline"}
-						color={"#0e162d"}
-						size={20}
-					/>
-				</Link>
+				<Ionicons
+					name={"search-outline"}
+					color={"#0e162d"}
+					size={20}
+					style={styles.searchIcon}
+				/>
+				<TextInput
+					style={styles.searchInput}
+					placeholder="Search for books..."
+					placeholderTextColor="#999"
+					value={searchQuery}
+					onChangeText={setSearchQuery}
+					onFocus={handleSearchFocus}
+					onSubmitEditing={handleSearchSubmit}
+					returnKeyType="search"
+				/>
 			</View>
 			<View style={styles.rightHeaderSection}>
 				{isAuthenticated ? (
@@ -79,8 +101,18 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderRadius: 5,
 		paddingHorizontal: 8,
-		justifyContent: "center",
+		flexDirection: "row",
+		alignItems: "center",
 		flex: 1,
+	},
+	searchIcon: {
+		marginRight: 8,
+	},
+	searchInput: {
+		flex: 1,
+		fontSize: 16,
+		color: "#0e162d",
+		// outlineStyle: "none",
 	},
 	rightHeaderSection: {
 		flex: 1,

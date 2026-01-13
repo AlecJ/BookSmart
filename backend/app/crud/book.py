@@ -15,11 +15,7 @@ CRUD operations for Book
 def create_book(*, session: Session, book_in: Book) -> Book:
     db_book = Book.model_validate(book_in)
     session.add(db_book)
-    try:
-        session.commit()
-    except IntegrityError as e:
-        session.rollback()
-        raise e
+    session.commit()
     session.refresh(db_book)
     return db_book
 
@@ -32,6 +28,12 @@ def get_books(*, session: Session) -> list[Book]:
 
 def get_book_by_id(*, session: Session, book_id: int) -> Book | None:
     statement = select(Book).where(Book.id == book_id)
+    book = session.exec(statement).first()
+    return book
+
+
+def get_book_by_google_book_id(*, session: Session, google_book_id: str) -> Book | None:
+    statement = select(Book).where(Book.google_book_id == google_book_id)
     book = session.exec(statement).first()
     return book
 
@@ -53,7 +55,7 @@ CRUD operations for BookLinks
 
 
 def create_book_link(*, session: Session, user_id: uuid.UUID, book_id: uuid.UUID) -> UserBookLink:
-    user_book_link = UserBookLink(user_id=user.id, book_id=book.id)
+    user_book_link = UserBookLink(user_id=user_id, book_id=book_id)
     session.add(user_book_link)
     session.commit()
     session.refresh(user_book_link)

@@ -1,10 +1,12 @@
+import { useBooksCtx } from "@/app/contexts/BookContext";
 import Book from "@/components/book";
 import { BookType } from "@/types";
-import { Link, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
 	ActivityIndicator,
 	Platform,
+	Pressable,
 	StyleSheet,
 	Text,
 	View,
@@ -15,23 +17,31 @@ export default function BookSearchDetailsPage() {
 	const [book, setBook] = useState<BookType | null>(null);
 	const isWeb = Platform.OS === "web";
 
-	useEffect(() => {
-		// Fetch your book data here
-		// For now, using mock data
-		const fetchBook = async () => {
-			const bookData = {
-				name: "Letters_to_a_Young_Chef",
-				prettyName: "Letters to a Young Chef",
-				author: "Daniel Boulud",
-				description:
-					"A heartfelt collection of letters from renowned chef Daniel Boulud to aspiring chefs, offering wisdom, inspiration, and insights into the culinary world.",
-				imgSrc: require("@/assets/images/LettersToAYoungChef.jpg"),
-			};
-			setBook(bookData);
-		};
+	const { selectedBook, viewSearchResultBook, addBookToLibrary } =
+		useBooksCtx();
 
-		fetchBook();
-	}, [bookId]);
+	const handleAddToLibrary = async () => {
+		if (book) {
+			try {
+				await addBookToLibrary(book);
+				router.replace(`/read/${book.id}`);
+				alert("Book added to your library!");
+			} catch (error) {
+				console.error("Failed to add book to library:", error);
+				alert("Failed to add book to library. Please try again.");
+			}
+		}
+	};
+
+	useEffect(() => {
+		if (!selectedBook && bookId && viewSearchResultBook) {
+			viewSearchResultBook(bookId as string);
+		}
+
+		if (selectedBook) {
+			setBook(selectedBook);
+		}
+	}, [bookId, selectedBook]);
 
 	// Show loading indicator while book is being fetched
 	if (!book) {
@@ -55,7 +65,7 @@ export default function BookSearchDetailsPage() {
 				)}
 				<View style={styles.bookInfo}>
 					<Text style={[styles.text, styles.bookTitle]}>
-						{book.prettyName}
+						{book.title}
 					</Text>
 					<Text style={[styles.text, styles.authorText]}>
 						{book.author}
@@ -70,11 +80,12 @@ export default function BookSearchDetailsPage() {
 				</View>
 			</View>
 			<View style={styles.addToLibaryBtnContainer}>
-				<Link href={`/read/${bookId}`}>
-					<View style={styles.addToLibraryBtn}>
-						<Text>Add to Library</Text>
-					</View>
-				</Link>
+				<Pressable
+					style={styles.addToLibraryBtn}
+					onPress={handleAddToLibrary}
+				>
+					<Text>Add to Library</Text>
+				</Pressable>
 			</View>
 		</View>
 	);

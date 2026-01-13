@@ -2,7 +2,6 @@ import { Link, router } from "expo-router";
 import React, { useState } from "react";
 import {
 	ActivityIndicator,
-	Alert,
 	StyleSheet,
 	Text,
 	TextInput,
@@ -14,22 +13,29 @@ import { useAuth } from "../contexts/AuthContext";
 export default function LoginScreen() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [confirmPassword, setConfirmPassword] = useState("");
+	const [errorText, setErrorText] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
-	const { login } = useAuth();
+	const { register } = useAuth();
 
-	const handleLogin = async () => {
+	const handleRegister = async () => {
 		if (!email || !password) {
-			Alert.alert("Error", "Please enter both email and password");
+			setErrorText("Please enter both email and password");
+			return;
+		}
+
+		if (password !== confirmPassword) {
+			setErrorText("Passwords do not match");
 			return;
 		}
 
 		setIsLoading(true);
 		try {
-			await login(email, password);
+			await register(email, password);
 			// Navigation will be handled automatically by the auth check
 			router.replace("/(tabs)");
 		} catch (error: any) {
-			Alert.alert("Login Failed", error.message || "Invalid credentials");
+			setErrorText(error.message || "Registration Failed.");
 		} finally {
 			setIsLoading(false);
 		}
@@ -39,7 +45,11 @@ export default function LoginScreen() {
 		<View style={styles.container}>
 			<View style={styles.form}>
 				<Text style={styles.title}>Welcome to BookSmart</Text>
-				<Text style={styles.subtitle}>Sign in to continue</Text>
+				<Text style={styles.subtitle}>Sign up for a new account</Text>
+
+				{!!errorText && (
+					<Text style={styles.errorText}>{errorText}</Text>
+				)}
 
 				<TextInput
 					style={styles.input}
@@ -60,22 +70,31 @@ export default function LoginScreen() {
 					autoComplete="password"
 				/>
 
+				<TextInput
+					style={styles.input}
+					placeholder="Confirm password"
+					value={confirmPassword}
+					onChangeText={setConfirmPassword}
+					secureTextEntry
+					autoComplete="password"
+				/>
+
 				<TouchableOpacity
 					style={[styles.button, isLoading && styles.buttonDisabled]}
-					onPress={handleLogin}
+					onPress={handleRegister}
 					disabled={isLoading}
 				>
 					{isLoading ? (
 						<ActivityIndicator color="#fff" />
 					) : (
-						<Text style={styles.buttonText}>Sign In</Text>
+						<Text style={styles.buttonText}>Create Account</Text>
 					)}
 				</TouchableOpacity>
 
-				<Link href="/(auth)/register" asChild>
+				<Link href="/(auth)/login" asChild>
 					<TouchableOpacity>
 						<Text style={styles.linkText}>
-							Don't have an account? Register here
+							Already have an account? Log in here
 						</Text>
 					</TouchableOpacity>
 				</Link>
@@ -148,5 +167,10 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		marginTop: 20,
 		fontSize: 14,
+	},
+	errorText: {
+		color: "red",
+		textAlign: "center",
+		marginBottom: 10,
 	},
 });

@@ -8,6 +8,7 @@ export interface UserType {
 
 export interface BookType {
 	id: string;
+	google_book_id: string;
 	title: string;
 	author: string;
 	description: string;

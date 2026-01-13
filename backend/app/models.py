@@ -55,7 +55,6 @@ class Book(SQLModel, table=True):
 class UserBookLink(SQLModel, table=True):
     user_id: uuid.UUID = Field(foreign_key="user.id", primary_key=True)
     book_id: uuid.UUID = Field(foreign_key="book.id", primary_key=True)
-
     user: User = Relationship(back_populates="books")
     book: Book = Relationship()
 

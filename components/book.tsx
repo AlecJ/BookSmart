@@ -33,7 +33,7 @@ export default function Book({
 		<>
 			<View style={[styles.imageContainer]}>
 				<Image
-					source={book.imgSrc ? book.imgSrc : placeholderImage}
+					source={book.imgSrc || book.image_url || placeholderImage}
 					style={[
 						style,
 						styles.book,
@@ -42,6 +42,15 @@ export default function Book({
 						},
 					]}
 					transition={200}
+					placeholder={placeholderImage}
+					contentFit="cover"
+					cachePolicy="memory-disk"
+					recyclingKey={book.id?.toString() || book.google_book_id}
+					onError={() =>
+						console.warn(
+							`Failed to load image for book: ${book.title}`
+						)
+					}
 				/>
 
 				{showGradient && (

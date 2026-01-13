@@ -1,28 +1,36 @@
-import { Book } from "@/types";
+import { BookType } from "@/types";
 import React, { createContext, useEffect, useState } from "react";
 import { bookService } from "../services/bookService";
 import { useAuth } from "./AuthContext";
 
 interface BookContextType {
-	books: Book[];
-	getBooks: () => Promise<void>;
-	addBookToLibrary: (book: Book) => Promise<void>;
+	selectedBook?: BookType;
+	books: BookType[];
+	searchBookResults: BookType[];
+	getUserBooks: () => Promise<void>;
+	searchBooks: (query: string) => Promise<void>;
+	viewSearchResultBook?: (bookId: string) => Promise<void>;
+	addBookToLibrary: (book: BookType) => Promise<void>;
 }
 
 const BookContext = createContext<BookContextType | undefined>(undefined);
 
 export function BookProvider({ children }: { children: React.ReactElement }) {
-	const [books, setBooks] = useState<Book[]>([]);
+	const [selectedBook, setSelectedBook] = useState<BookType | undefined>(
+		undefined
+	);
+	const [books, setBooks] = useState<BookType[]>([]);
+	const [searchBookResults, setSearchBooks] = useState<BookType[]>([]);
 	const { isLoading, isAuthenticated } = useAuth();
 
 	useEffect(() => {
 		// Only fetch books after auth is initialized and user is authenticated
 		if (!isLoading && isAuthenticated) {
-			getBooks();
+			getUserBooks();
 		}
 	}, [isLoading, isAuthenticated]);
 
-	const getBooks = async () => {
+	const getUserBooks = async () => {
 		try {
 			const userBooks = await bookService.getBooks();
 			setBooks(userBooks);
@@ -34,13 +42,52 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 		}
 	};
 
-	const addBookToLibrary = async (book: Book) => {};
+	const searchBooks = async (query: string) => {
+		try {
+			const results = await bookService.searchBooks(query);
+			setSearchBooks(results);
+		} catch (error: any) {
+			console.error("Book search failed:", error);
+			throw new Error(
+				error.response?.data?.detail || "Book search failed."
+			);
+		}
+	};
+
+	const viewSearchResultBook = async (bookId: string) => {
+		try {
+			const book = await bookService.getOrCreateSearchBook(bookId);
+			setSelectedBook(book);
+		} catch (error: any) {
+			console.error("Failed to retrieve book details:", error);
+			throw new Error(
+				error.response?.data?.detail ||
+					"Failed to retrieve book details."
+			);
+		}
+	};
+
+	const addBookToLibrary = async (book: BookType) => {
+		try {
+			const userBooks = await bookService.addBookToLibrary(book);
+			setBooks(userBooks);
+		} catch (error: any) {
+			console.error("Failed to add book to library:", error);
+			throw new Error(
+				error.response?.data?.detail || "Failed to add book to library."
+			);
+		}
+	};
 
 	return (
 		<BookContext.Provider
 			value={{
+				selectedBook,
 				books,
-				getBooks,
+				searchBookResults,
+				getUserBooks,
+				searchBooks,
+				viewSearchResultBook,
 				addBookToLibrary,
 			}}
 		>

@@ -33,7 +33,7 @@ export default function Index() {
 					const content = (
 						<>
 							<View style={styles.container}>
-								<Link asChild href={`/read/${books[0].name}`}>
+								<Link asChild href={`/read/${books[0].id}`}>
 									<Book
 										style={styles.mainBook}
 										book={books[0]}

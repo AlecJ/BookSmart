@@ -8,7 +8,7 @@ type Props = { results: BookType[] };
 export default function SearchResultsList({ results }: Props) {
 	const resultsList = results.map((result, index) => {
 		return (
-			<Pressable key={index} href={`./search/${result.name}`}>
+			<Pressable key={index} href={`./search/${result.google_book_id}`}>
 				<BookRowSearch
 					key={index}
 					book={result}
