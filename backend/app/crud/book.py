@@ -2,7 +2,7 @@ import uuid
 from sqlmodel import Session, select
 from sqlalchemy.exc import IntegrityError
 
-from app.models import (Book, BookChapter, BookChapterCreate,
+from app.models import (User, UserBookLink, Book, BookChapter, BookChapterCreate,
                         ChapterQuestionCreate, ChapterQuestion)
 
 
@@ -44,6 +44,23 @@ def delete_book():
     pass
 
 # endregion BookCRUD
+
+
+'''
+CRUD operations for BookLinks
+'''
+# region BookLinkCRUD
+
+
+def create_book_link(*, session: Session, user_id: uuid.UUID, book_id: uuid.UUID) -> UserBookLink:
+    user_book_link = UserBookLink(user_id=user.id, book_id=book.id)
+    session.add(user_book_link)
+    session.commit()
+    session.refresh(user_book_link)
+    return user_book_link
+
+
+# endregion BookLinkCRUD
 
 
 '''

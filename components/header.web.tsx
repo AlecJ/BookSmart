@@ -1,10 +1,13 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
+import { useAuth } from "../app/contexts/AuthContext";
 
 // import { SearchBar } from "react-native-elements";
 
 export default function Header() {
+	const { logout, isAuthenticated } = useAuth();
+
 	return (
 		<View style={styles.header}>
 			<View style={styles.leftHeaderSection}>
@@ -22,11 +25,27 @@ export default function Header() {
 				</Link>
 			</View>
 			<View style={styles.rightHeaderSection}>
-				<Link asChild href={`/profile`}>
-					<Text style={styles.headerText}>Profile</Text>
-				</Link>
+				{isAuthenticated ? (
+					<>
+						<Link asChild href={`/profile`}>
+							<Text style={styles.headerText}>Profile</Text>
+						</Link>
 
-				<Text style={styles.headerText}>Settings</Text>
+						<Text style={styles.headerText} onPress={logout}>
+							Log Out
+						</Text>
+					</>
+				) : (
+					<>
+						<Link asChild href={`/(auth)/login`}>
+							<Text style={styles.headerText}>Register</Text>
+						</Link>
+
+						<Link asChild href={`/(auth)/login`}>
+							<Text style={styles.headerText}>Login</Text>
+						</Link>
+					</>
+				)}
 			</View>
 		</View>
 	);

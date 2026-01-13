@@ -1,26 +1,28 @@
 import Book from "@/components/book";
-import { BookType } from "@/types";
 import { Link } from "expo-router";
 import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useBooksCtx } from "../contexts/BookContext";
 
 export default function Index() {
 	const isWeb = Platform.OS === "web";
 
-	const books: BookType[] = [
-		{
-			name: "Letters_to_a_Young_Chef",
-			imgSrc: require("@/assets/images/LettersToAYoungChef.jpg"),
-			progress: 0.75,
-		},
-		{ name: "Book 2" },
-		{ name: "Book 3" },
-		{ name: "Book 4" },
-		{ name: "Book 5" },
-		{ name: "Book 9" },
-		{ name: "Book 6" },
-		{ name: "Book 7" },
-		{ name: "Book 8" },
-	];
+	const { books } = useBooksCtx();
+
+	// const books: BookType[] = [
+	// 	{
+	// 		name: "Letters_to_a_Young_Chef",
+	// 		imgSrc: require("@/assets/images/LettersToAYoungChef.jpg"),
+	// 		progress: 0.75,
+	// 	},
+	// 	{ name: "Book 2" },
+	// 	{ name: "Book 3" },
+	// 	{ name: "Book 4" },
+	// 	{ name: "Book 5" },
+	// 	{ name: "Book 9" },
+	// 	{ name: "Book 6" },
+	// 	{ name: "Book 7" },
+	// 	{ name: "Book 8" },
+	// ];
 
 	return (
 		<>

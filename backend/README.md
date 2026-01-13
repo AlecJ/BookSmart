@@ -43,8 +43,12 @@
 
 ## To Do
 
--   connect frontend to backend
--   add user auth
+-   get users books
+-   add to library
+-   get questions (auto)
+-   submit response
+
+-   redo login/register page
 
 -   test on web
 -   catch ios up to web
@@ -54,8 +58,17 @@
 -   how to get a bunch of books
 -   add response to db
 -   seed script
+-   deploy
+
+-   tests
+-   add tests to deploy process
 
 ## Routes
+
+GET /api/v1/login -- login user
+POST /api/v1/register -- create user
+
+GET /api/v1/profile -- view user page
 
 GET /api/v1/search -- perform search and return results
 GET /api/v1/read -- get users books
@@ -63,7 +76,3 @@ POST /api/v1/read/{bookId} -- add book to user's library
 DEL /api/v1/read/{bookId} -- remove a book from a user's library
 GET /api/v1/read/{bookId} -- get book details/questions/chapters for user for one book
 POST /api/v1/read{bookId}/submit -- post users answers to questions and fetch feedback
-
-GET ../user -- login user
-POST ../user -- create user
-DEL ../user -- delete user

@@ -1,8 +1,52 @@
 import Header from "@/components/header";
-import { Stack } from "expo-router";
-import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Stack, useRouter, useSegments } from "expo-router";
+import { useEffect } from "react";
+import {
+	ActivityIndicator,
+	Platform,
+	ScrollView,
+	StyleSheet,
+	View,
+} from "react-native";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { BookProvider } from "./contexts/BookContext";
 
-export default function RootLayout() {
+function RootLayoutNav() {
+	const { isAuthenticated, isLoading } = useAuth();
+	const segments = useSegments();
+	const router = useRouter();
+
+	useEffect(() => {
+		if (isLoading) return;
+
+		const inAuthGroup = segments[0] === "(auth)";
+
+		const inPublicGroup = segments[0] === "search";
+
+		console.log(isAuthenticated, inAuthGroup);
+
+		if (!isAuthenticated && !inAuthGroup && !inPublicGroup) {
+			// Redirect to login if not authenticated
+			router.replace("/(auth)/login");
+		} else if (isAuthenticated && inAuthGroup) {
+			// Redirect to tabs if authenticated and on login page
+			router.replace("/(tabs)");
+		}
+	}, [isAuthenticated, isLoading, segments]);
+
+	if (isLoading) {
+		return (
+			<View
+				style={[
+					styles.container,
+					{ justifyContent: "center", alignItems: "center" },
+				]}
+			>
+				<ActivityIndicator size="large" color="#4A90E2" />
+			</View>
+		);
+	}
+
 	if (Platform.OS === "web") {
 		return (
 			<View style={styles.container}>
@@ -12,10 +56,10 @@ export default function RootLayout() {
 					contentContainerStyle={{ alignItems: "center" }}
 				>
 					<View style={styles.content}>
-						<Stack
-							initialRouteName="(tabs)"
-							screenOptions={{ headerShown: false }}
-						/>
+						<Stack screenOptions={{ headerShown: false }}>
+							<Stack.Screen name="(auth)/login" />
+							<Stack.Screen name="(tabs)" />
+						</Stack>
 					</View>
 				</ScrollView>
 			</View>
@@ -23,12 +67,20 @@ export default function RootLayout() {
 	}
 
 	return (
-		<Stack>
-			<Stack.Screen
-				name="(tabs)"
-				options={{ headerShown: false, title: "Home" }}
-			/>
+		<Stack screenOptions={{ headerShown: false }}>
+			<Stack.Screen name="(auth)/login" />
+			<Stack.Screen name="(tabs)" options={{ title: "Home" }} />
 		</Stack>
+	);
+}
+
+export default function RootLayout() {
+	return (
+		<AuthProvider>
+			<BookProvider>
+				<RootLayoutNav />
+			</BookProvider>
+		</AuthProvider>
 	);
 }
 
