@@ -20,13 +20,16 @@ export const bookService = {
 	},
 
 	addBookToLibrary: async (book: BookType) => {
-		const response = await api.post("/read/add", null, {
+		const { data } = await api.post("/read/add", null, {
 			params: { book_id: book.id },
 		});
-		return response.data;
+		return data;
 	},
 
-	getBookById: async (id: string) => {},
+	getUserBookData: async (bookId: string) => {
+		const { data } = await api.get(`/read/${bookId}`);
+		return data;
+	},
 
 	getBookChapters: async (bookId: string) => {},
 

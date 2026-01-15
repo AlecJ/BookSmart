@@ -1,6 +1,7 @@
+import { useBooksCtx } from "@/app/contexts/BookContext";
 import Book from "@/components/book";
 import ChapterBtn from "@/components/chapterBtn";
-import { Link, useLocalSearchParams } from "expo-router";
+import { Link } from "expo-router";
 import {
 	ActivityIndicator,
 	Platform,
@@ -9,11 +10,10 @@ import {
 	Text,
 	View,
 } from "react-native";
-import { useBook } from "./_layout";
 
 export default function BookDetailsScreen() {
-	const { bookId } = useLocalSearchParams();
-	const { book } = useBook();
+	const { selectedBook: book } = useBooksCtx();
+
 	const chapters = book?.chapters || [];
 
 	const isWeb = Platform.OS === "web";

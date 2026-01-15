@@ -1,4 +1,4 @@
-import { useBook } from "@/app/read/[bookId]/_layout";
+import { useBooksCtx } from "@/app/contexts/BookContext";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, useGlobalSearchParams, useSegments } from "expo-router";
@@ -7,7 +7,7 @@ import { StyleSheet, Text, View } from "react-native";
 export default function NavBar() {
 	const segments = useSegments();
 	const params = useGlobalSearchParams(); // { bookId: '123', chapterNum: '5' }
-	const { book } = useBook();
+	const { selectedBook: book } = useBooksCtx();
 
 	const links = segments.filter((segment) => {
 		return (
@@ -17,10 +17,12 @@ export default function NavBar() {
 		);
 	});
 
+	console.log(book);
+
 	const linkObjects = links.map((segment, i) => {
 		if (segment === "[bookId]") {
 			return {
-				label: book?.prettyName || params.bookId,
+				label: book?.title || params.bookId,
 				href: `/read/${params.bookId}`,
 			};
 		} else if (segment === "[chapterNum]") {

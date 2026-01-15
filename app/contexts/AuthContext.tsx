@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useState,
+} from "react";
 import { api } from "../services/api";
 import { userService } from "../services/userService";
 import { secureStorage } from "../utils/secureStorage";
@@ -20,12 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const [isLoading, setIsLoading] = useState(true);
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-	// Check authentication status on mount
-	useEffect(() => {
-		checkAuth();
-	}, []);
-
-	const checkAuth = async () => {
+	const checkAuth = useCallback(async () => {
 		try {
 			const token = await secureStorage.getItem(TOKEN_KEY);
 			if (token) {
@@ -46,9 +47,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}, []);
 
-	const login = async (email: string, password: string) => {
+	// Check authentication status on mount
+	useEffect(() => {
+		checkAuth();
+	}, [checkAuth]);
+
+	const login = useCallback(async (email: string, password: string) => {
 		try {
 			const access_token = await userService.login(email, password);
 
@@ -64,9 +70,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 			console.error("Login failed:", error);
 			throw new Error(error.response?.data?.detail || "Login failed");
 		}
-	};
+	}, []);
 
-	const register = async (email: string, password: string) => {
+	const register = useCallback(async (email: string, password: string) => {
 		try {
 			await userService.register(email, password);
 		} catch (error: any) {
@@ -75,9 +81,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 				error.response?.data?.detail || "Registration failed"
 			);
 		}
-	};
+	}, []);
 
-	const logout = async () => {
+	const logout = useCallback(async () => {
 		try {
 			await secureStorage.removeItem(TOKEN_KEY);
 			delete api.defaults.headers.common["Authorization"];
@@ -85,7 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		} catch (error) {
 			console.error("Logout failed:", error);
 		}
-	};
+	}, []);
 
 	return (
 		<AuthContext.Provider

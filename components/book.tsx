@@ -46,6 +46,7 @@ export default function Book({
 					contentFit="cover"
 					cachePolicy="memory-disk"
 					recyclingKey={book.id?.toString() || book.google_book_id}
+					priority="high"
 					onError={() =>
 						console.warn(
 							`Failed to load image for book: ${book.title}`

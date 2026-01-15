@@ -43,23 +43,18 @@
 
 ## To Do
 
--   get users books
--   add to library
 -   get questions (auto)
 -   submit response
-
 -   redo login/register page
+-   recent books on homepage
 
 -   test on web
 -   catch ios up to web
 -   polish frontends
 -   test very big resolution
 
--   how to get a bunch of books
--   add response to db
 -   seed script
 -   deploy
-
 -   tests
 -   add tests to deploy process
 

@@ -1,6 +1,7 @@
 import { BookType } from "@/types";
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 import { bookService } from "../services/bookService";
+import { preloadImages } from "../utils/imageCache";
 import { useAuth } from "./AuthContext";
 
 interface BookContextType {
@@ -8,6 +9,7 @@ interface BookContextType {
 	books: BookType[];
 	searchBookResults: BookType[];
 	getUserBooks: () => Promise<void>;
+	getUserBookData: (bookId: string) => Promise<void>;
 	searchBooks: (query: string) => Promise<void>;
 	viewSearchResultBook?: (bookId: string) => Promise<void>;
 	addBookToLibrary: (book: BookType) => Promise<void>;
@@ -30,9 +32,18 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 		}
 	}, [isLoading, isAuthenticated]);
 
-	const getUserBooks = async () => {
+	const getUserBooks = useCallback(async () => {
 		try {
 			const userBooks = await bookService.getBooks();
+
+			// Preload book cover images into cache BEFORE setting state
+			const imageUrls = userBooks
+				.map((book) => book.image_url)
+				.filter(Boolean);
+			if (imageUrls.length > 0) {
+				await preloadImages(imageUrls);
+			}
+
 			setBooks(userBooks);
 		} catch (error: any) {
 			console.error("Failed to retrieve user books:", error);
@@ -40,11 +51,32 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 				error.response?.data?.detail || "Failed to retrieve user books."
 			);
 		}
-	};
+	}, []);
 
-	const searchBooks = async (query: string) => {
+	const getUserBookData = useCallback(async (bookId: string) => {
+		try {
+			const bookData = await bookService.getUserBookData(bookId);
+			setSelectedBook(bookData);
+		} catch (error: any) {
+			console.error("Failed to retrieve book data:", error);
+			throw new Error(
+				error.response?.data?.detail || "Failed to retrieve book data."
+			);
+		}
+	}, []);
+
+	const searchBooks = useCallback(async (query: string) => {
 		try {
 			const results = await bookService.searchBooks(query);
+
+			// Preload search result images into cache BEFORE setting state
+			const imageUrls = results
+				.map((book) => book.image_url)
+				.filter(Boolean);
+			if (imageUrls.length > 0) {
+				await preloadImages(imageUrls);
+			}
+
 			setSearchBooks(results);
 		} catch (error: any) {
 			console.error("Book search failed:", error);
@@ -52,9 +84,9 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 				error.response?.data?.detail || "Book search failed."
 			);
 		}
-	};
+	}, []);
 
-	const viewSearchResultBook = async (bookId: string) => {
+	const viewSearchResultBook = useCallback(async (bookId: string) => {
 		try {
 			const book = await bookService.getOrCreateSearchBook(bookId);
 			setSelectedBook(book);
@@ -65,19 +97,19 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 					"Failed to retrieve book details."
 			);
 		}
-	};
+	}, []);
 
-	const addBookToLibrary = async (book: BookType) => {
+	const addBookToLibrary = useCallback(async (book: BookType) => {
 		try {
-			const userBooks = await bookService.addBookToLibrary(book);
-			setBooks(userBooks);
+			const newBook = await bookService.addBookToLibrary(book);
+			setBooks((prevBooks) => [newBook, ...prevBooks]);
 		} catch (error: any) {
 			console.error("Failed to add book to library:", error);
 			throw new Error(
 				error.response?.data?.detail || "Failed to add book to library."
 			);
 		}
-	};
+	}, []);
 
 	return (
 		<BookContext.Provider
@@ -85,6 +117,7 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 				selectedBook,
 				books,
 				searchBookResults,
+				getUserBookData,
 				getUserBooks,
 				searchBooks,
 				viewSearchResultBook,

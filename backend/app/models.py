@@ -1,5 +1,5 @@
 import uuid
-
+from datetime import datetime
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel, UniqueConstraint
 
@@ -57,6 +57,7 @@ class UserBookLink(SQLModel, table=True):
     book_id: uuid.UUID = Field(foreign_key="book.id", primary_key=True)
     user: User = Relationship(back_populates="books")
     book: Book = Relationship()
+    last_updated: datetime = Field(default_factory=datetime.now)
 
 
 class BookChapterBase(SQLModel):

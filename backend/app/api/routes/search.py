@@ -1,5 +1,7 @@
 import uuid
 import os
+import re
+import html
 import httpx
 from fastapi import APIRouter, HTTPException
 
@@ -33,7 +35,9 @@ async def search_books(*, q: str) -> list[Book]:
         # filter out duplicates (same title and author)
         unique_results = {}
         for book in results:
-            key = (book.title, book.author)
+            title = book.title.strip().lower().replace(" ", "")
+            author = book.author.strip().lower().replace(" ", "").replace(".", "")
+            key = title + author
             if key not in unique_results:
                 unique_results[key] = book
 
@@ -64,8 +68,6 @@ async def get_or_create_book(*, session: SessionDep, google_book_id: str) -> Boo
 
         google_book = response.json()
 
-        print(google_book)
-        # breakpoint()
         book_in = convert_google_book_to_db_model(google_book=google_book)
         db_book = crud.create_book(session=session, book_in=book_in)
 
@@ -116,16 +118,36 @@ async def search_audible_books(*, title: str, author: str = ""):
     return {"asin": ASIN, "chapters": result_chapters}
 
 
+def strip_html_tags(text: str) -> str:
+    """Remove HTML tags and decode HTML entities from text."""
+    if not text:
+        return ""
+    # Remove HTML tags
+    text = re.sub(r'<[^>]+>', '', text)
+    # Decode HTML entities (e.g., &amp; -> &)
+    text = html.unescape(text)
+    return text.strip()
+
+
 def convert_google_book_to_db_model(*, google_book: dict) -> Book:
     google_book_id = google_book.get('id')
     book_data = google_book.get('volumeInfo', {})
 
     title = book_data.get('title')
     author = ', '.join(book_data.get('authors', []))
-    description = book_data.get('description', '')
+    description = strip_html_tags(book_data.get('description', ''))
     image_links = book_data.get('imageLinks', {})
     image_url = image_links.get('large') or image_links.get(
         'medium') or image_links.get('small') or image_links.get('thumbnail')
+
+    # Fix Google image URLs - replace http with https and add zoom parameter
+    if image_url:
+        image_url = image_url.replace('http:', 'https:')
+        # Remove existing zoom parameter if present and add zoom=1 for better quality
+        if '&edge=curl' in image_url:
+            image_url = image_url.replace('&edge=curl', '')
+        if 'zoom=' not in image_url:
+            image_url = image_url + '&zoom=1'
 
     db_book = Book(google_book_id=google_book_id, title=title, author=author,
                    description=description, image_url=image_url)

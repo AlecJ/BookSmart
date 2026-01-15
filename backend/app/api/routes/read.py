@@ -26,6 +26,8 @@ def get_books_for_user(*, session: SessionDep, current_user: CurrentUser) -> lis
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
+    user_links = user.books
+    user_links.sort(key=lambda link: link.last_updated, reverse=True)
     user_books = [link.book for link in user.books]
 
     return user_books
@@ -34,7 +36,7 @@ def get_books_for_user(*, session: SessionDep, current_user: CurrentUser) -> lis
 @router.get(
     "/{book_id}"
 )
-def get_book_details_for_user(*, session: SessionDep, current_user: CurrentUser, book_id: str) -> list[Book]:
+def get_book_details_for_user(*, session: SessionDep, current_user: CurrentUser, book_id: uuid.UUID) -> Book:
     """
     Get all books in the user's library.
     """
@@ -43,7 +45,11 @@ def get_book_details_for_user(*, session: SessionDep, current_user: CurrentUser,
         raise HTTPException(status_code=404, detail="User not found")
 
     user_book = next(
-        (link.book for link in user.books if link.book.id == book_id), None)
+        (link.book for link in user.books if link.book_id == book_id), None)
+
+    if not user_book:
+        raise HTTPException(
+            status_code=404, detail="Book not found in user's library")
 
     return user_book
 
@@ -51,7 +57,7 @@ def get_book_details_for_user(*, session: SessionDep, current_user: CurrentUser,
 @router.post(
     "/add"
 )
-def add_book_to_user_library(*, session: SessionDep, current_user: CurrentUser, book_id: str) -> Book:
+def add_book_to_user_library(*, session: SessionDep, current_user: CurrentUser, book_id: uuid.UUID) -> Book:
     """
     Add a book to the user's library.
     """

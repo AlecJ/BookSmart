@@ -1,12 +1,18 @@
 import Book from "@/components/book";
 import { Link } from "expo-router";
+import { useEffect } from "react";
+
 import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useBooksCtx } from "../contexts/BookContext";
 
 export default function Index() {
 	const isWeb = Platform.OS === "web";
 
-	const { books } = useBooksCtx();
+	const { books, getUserBooks } = useBooksCtx();
+
+	useEffect(() => {
+		getUserBooks();
+	}, []);
 
 	// const books: BookType[] = [
 	// 	{
@@ -45,11 +51,17 @@ export default function Index() {
 							<View style={styles.container}>
 								<View style={styles.bookshelf}>
 									{books.slice(1).map((book, index) => (
-										<Book
+										<Link
 											key={index}
-											book={book}
-											style={styles.smallBook}
-										/>
+											asChild
+											href={`/read/${book.id}`}
+										>
+											<Book
+												key={index}
+												book={book}
+												style={styles.smallBook}
+											/>
+										</Link>
 									))}
 								</View>
 							</View>
