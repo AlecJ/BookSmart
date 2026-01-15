@@ -76,6 +76,23 @@ class BookChapter(BookChapterBase, table=True):
         back_populates="chapter", cascade_delete=True)
 
 
+class BookChapterPublic(BookChapterBase):
+    id: uuid.UUID
+    book_id: uuid.UUID
+    status: str | None
+    # questions: list["ChapterQuestionPublic"] = []
+
+
+class BookWithChapters(SQLModel):
+    id: uuid.UUID
+    google_book_id: str | None
+    title: str
+    author: str
+    description: str
+    image_url: str
+    chapters: list[BookChapterPublic]
+
+
 class ChapterQuestionBase(SQLModel):
     question_text: str = Field(unique=True, index=True)
 
@@ -92,6 +109,12 @@ class ChapterQuestion(ChapterQuestionBase, table=True):
         back_populates="question", cascade_delete=True)
 
 
+class ChapterQuestionPublic(ChapterQuestionBase):
+    id: uuid.UUID
+    chapter_id: uuid.UUID
+    responses: list["UserResponsePublic"]
+
+
 class UserResponse(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     user_id: uuid.UUID = Field(foreign_key="user.id")
@@ -101,6 +124,15 @@ class UserResponse(SQLModel, table=True):
     response_text: str = Field()
     feedback_text: str = Field()
     feedback_grade: int = Field()  # 0 = incorrect, 1 = partially correct, 2 = correct
+
+
+class UserResponsePublic(SQLModel):
+    id: uuid.UUID
+    user_id: uuid.UUID
+    question_id: uuid.UUID
+    response_text: str
+    feedback_text: str
+    feedback_grade: int
 
 
 class Token(SQLModel):

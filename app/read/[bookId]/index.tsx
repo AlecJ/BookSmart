@@ -1,7 +1,7 @@
 import { useBooksCtx } from "@/app/contexts/BookContext";
 import Book from "@/components/book";
 import ChapterBtn from "@/components/chapterBtn";
-import { Link } from "expo-router";
+import { router } from "expo-router";
 import {
 	ActivityIndicator,
 	Platform,
@@ -12,7 +12,7 @@ import {
 } from "react-native";
 
 export default function BookDetailsScreen() {
-	const { selectedBook: book } = useBooksCtx();
+	const { selectedBook: book, setSelectedChapter } = useBooksCtx();
 
 	const chapters = book?.chapters || [];
 
@@ -27,18 +27,19 @@ export default function BookDetailsScreen() {
 		);
 	}
 
+	const handleChapterPress = (chapter) => {
+		setSelectedChapter(chapter);
+		router.push(`/read/${book.id}/chapters/${chapter.id}`);
+	};
+
 	const chapterList = chapters.map((chapter) => (
-		<Link
+		<ChapterBtn
 			key={chapter.id}
-			asChild
-			href={`/read/${bookId}/chapters/${chapter.id}`}
-		>
-			<ChapterBtn
-				style={isWeb ? styles.chapterBtnWeb : styles.chapterBtn}
-				title={chapter.title}
-				status={chapter.status}
-			/>
-		</Link>
+			style={isWeb ? styles.chapterBtnWeb : styles.chapterBtn}
+			title={chapter.title}
+			status={chapter.status}
+			onPress={() => handleChapterPress(chapter)}
+		/>
 	));
 
 	const content = (

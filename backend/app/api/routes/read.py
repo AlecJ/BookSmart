@@ -1,11 +1,12 @@
 import uuid
 from fastapi import APIRouter, HTTPException
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import selectinload
 from sqlmodel import select
 
 from app.api.deps import SessionDep, CurrentUser
 from app import crud
-from app.models import User, Book, UserBookLink
+from app.models import User, Book, UserBookLink, BookWithChapters, BookChapter, ChapterQuestion
 
 router = APIRouter(prefix="/read", tags=["read"])
 
@@ -36,22 +37,55 @@ def get_books_for_user(*, session: SessionDep, current_user: CurrentUser) -> lis
 @router.get(
     "/{book_id}"
 )
-def get_book_details_for_user(*, session: SessionDep, current_user: CurrentUser, book_id: uuid.UUID) -> Book:
+def get_book_details_for_user(*, session: SessionDep, current_user: CurrentUser, book_id: uuid.UUID) -> BookWithChapters:
     """
-    Get all books in the user's library.
+    Return book details and user related data for a specific book in the user's library.
     """
-    user = session.get(User, current_user.id)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+    # First verify the user has this book in their library
+    user_link = session.exec(
+        select(UserBookLink).where(
+            UserBookLink.user_id == current_user.id,
+            UserBookLink.book_id == book_id
+        )
+    ).first()
 
-    user_book = next(
-        (link.book for link in user.books if link.book_id == book_id), None)
-
-    if not user_book:
+    if not user_link:
         raise HTTPException(
             status_code=404, detail="Book not found in user's library")
 
-    return user_book
+    # Now fetch the book with chapters eager loaded
+    user_book = session.exec(
+        select(Book)
+        .where(Book.id == book_id)
+        .options(
+            selectinload(Book.chapters)
+            .selectinload(BookChapter.questions)
+            # .selectinload(ChapterQuestion.responses)
+        )
+    ).first()
+
+    if not user_book:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    # Build response with status set to 'complete' for all chapters
+    return BookWithChapters(
+        id=user_book.id,
+        google_book_id=user_book.google_book_id,
+        title=user_book.title,
+        author=user_book.author,
+        description=user_book.description,
+        image_url=user_book.image_url,
+        chapters=[
+            {
+                "id": chapter.id,
+                "book_id": chapter.book_id,
+                "title": chapter.title,
+                "status": "complete",
+                "questions": chapter.questions,
+            }
+            for chapter in user_book.chapters
+        ]
+    )
 
 
 @router.post(

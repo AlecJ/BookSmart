@@ -38,6 +38,12 @@ def get_book_by_google_book_id(*, session: Session, google_book_id: str) -> Book
     return book
 
 
+def get_book_by_title_and_author(*, session: Session, title: str, author: str) -> Book | None:
+    statement = select(Book).where(Book.author == author, Book.title == title)
+    book = session.exec(statement).first()
+    return book
+
+
 def update_book():
     pass
 

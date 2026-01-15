@@ -10,9 +10,15 @@ export default function Index() {
 
 	const { books, getUserBooks } = useBooksCtx();
 
+	// useFocusEffect(
+	// 	useCallback(() => {
+	// 		getUserBooks();
+	// 	}, [getUserBooks])
+	// );
+
 	useEffect(() => {
 		getUserBooks();
-	}, []);
+	}, [getUserBooks]);
 
 	// const books: BookType[] = [
 	// 	{

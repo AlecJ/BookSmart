@@ -7,17 +7,15 @@ import { StyleSheet, Text, View } from "react-native";
 export default function NavBar() {
 	const segments = useSegments();
 	const params = useGlobalSearchParams(); // { bookId: '123', chapterNum: '5' }
-	const { selectedBook: book } = useBooksCtx();
+	const { selectedBook: book, selectedChapter: chapter } = useBooksCtx();
 
 	const links = segments.filter((segment) => {
 		return (
 			segment === "[bookId]" ||
-			segment === "[chapterNum]" ||
-			segment === "[questionNum]"
+			segment === "[chapterId]" ||
+			segment === "[questionId]"
 		);
 	});
-
-	console.log(book);
 
 	const linkObjects = links.map((segment, i) => {
 		if (segment === "[bookId]") {
@@ -25,15 +23,15 @@ export default function NavBar() {
 				label: book?.title || params.bookId,
 				href: `/read/${params.bookId}`,
 			};
-		} else if (segment === "[chapterNum]") {
+		} else if (segment === "[chapterId]") {
 			return {
-				label: `Chapter ${params.chapterNum}`,
-				href: `/read/${params.bookId}/chapters/${params.chapterNum}`,
+				label: chapter?.title || `Chapter ${params.chapterId}`,
+				href: `/read/${params.bookId}/chapters/${params.chapterId}`,
 			};
-		} else if (segment === "[questionNum]") {
+		} else if (segment === "[questionId]") {
 			return {
-				label: `Question ${params.questionNum}`,
-				href: `/read/${params.bookId}/chapters/${params.chapterNum}/question/${params.questionNum}`,
+				label: `Question ${params.questionId}`,
+				href: `/read/${params.bookId}/chapters/${params.chapterId}/question/${params.questionId}`,
 			};
 		}
 	});

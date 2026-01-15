@@ -69,15 +69,34 @@ async def get_or_create_book(*, session: SessionDep, google_book_id: str) -> Boo
         google_book = response.json()
 
         book_in = convert_google_book_to_db_model(google_book=google_book)
+
+        # check if book already exists in db
+        book = crud.get_book_by_title_and_author(
+            session=session, title=book_in.title, author=book_in.author)
+        if book:
+            return book
+
+        # otherwise create a new book
         db_book = crud.create_book(session=session, book_in=book_in)
+
+        # fetch chapters from Audible API
+        chapters = await get_book_chapters_from_audible(title=db_book.title, author=db_book.author)
+
+        # add chapters to db_book and db
+        for chapter_title in chapters:
+            chapter_in = {"title": chapter_title}
+            crud.create_book_chapter(
+                session=session, book_id=db_book.id, chapter_in=chapter_in)
+
+        session.refresh(db_book)
 
         return db_book
 
 
-@router.get(
-    "/audible"
-)
-async def search_audible_books(*, title: str, author: str = ""):
+# @router.get(
+#     "/audible"
+# )
+async def get_book_chapters_from_audible(*, title: str, author: str = ""):
     """
     Search for Audible books using the Audnex API.
     """
@@ -115,7 +134,7 @@ async def search_audible_books(*, title: str, author: str = ""):
         for chapter in chapters:
             result_chapters.append(chapter.get("title", ""))
 
-    return {"asin": ASIN, "chapters": result_chapters}
+    return result_chapters
 
 
 def strip_html_tags(text: str) -> str:

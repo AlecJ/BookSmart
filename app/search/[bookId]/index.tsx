@@ -25,7 +25,6 @@ export default function BookSearchDetailsPage() {
 			try {
 				await addBookToLibrary(book);
 				router.replace(`/read/${book.id}`);
-				alert("Book added to your library!");
 			} catch (error) {
 				console.error("Failed to add book to library:", error);
 				alert("Failed to add book to library. Please try again.");

@@ -1,9 +1,11 @@
-import { useBook } from "@/app/read/[bookId]/_layout";
+import { useBooksCtx } from "@/app/contexts/BookContext";
 import ChapterBtn from "@/components/chapterBtn";
-import { Link, useLocalSearchParams } from "expo-router";
+import { Link, router, useLocalSearchParams } from "expo-router";
+import { useEffect } from "react";
 import {
 	ActivityIndicator,
 	Platform,
+	Pressable,
 	ScrollView,
 	StyleSheet,
 	Text,
@@ -11,9 +13,23 @@ import {
 } from "react-native";
 
 export default function BookDetailsScreen() {
-	const { chapterNum } = useLocalSearchParams();
-	const { book, getChapter } = useBook();
-	const questions = getChapter(Number(chapterNum))?.questions || [];
+	const { chapterId } = useLocalSearchParams();
+	const {
+		selectedBook: book,
+		selectedChapter: chapter,
+		getChapter,
+		setSelectedChapter,
+		setSelectedQuestion,
+	} = useBooksCtx();
+	const questions = chapter?.questions || [];
+	console.log(chapter);
+
+	useEffect(() => {
+		if (!chapter) {
+			const chapterToSet = getChapter(chapterId as string);
+			setSelectedChapter(chapterToSet);
+		}
+	}, [chapter, chapterId, getChapter, setSelectedChapter]);
 
 	// Show loading indicator while book is being fetched
 	if (!book) {
@@ -24,31 +40,35 @@ export default function BookDetailsScreen() {
 		);
 	}
 
+	const handleQuestionBtn = (question: any) => {
+		setSelectedQuestion(question);
+		router.push(`./${chapterId}/question/${question.id}`);
+	};
+
 	const isWeb = Platform.OS === "web";
 
 	const questionList = questions.map((question) => (
-		<Link
+		<Pressable
 			key={question.id}
-			asChild
-			href={`./${chapterNum}/question/${question.id}`}
+			onPress={() => handleQuestionBtn(question)}
 		>
 			<ChapterBtn
 				style={styles.questionBtn}
 				title={question.text}
 				status={question.status}
 			/>
-		</Link>
+		</Pressable>
 	));
 
 	const content = (
 		<>
-			<Link href={`/read/${book.name}`}>
+			<Link href={`/read/${book.title}`}>
 				<Text style={[styles.text, styles.bookTitle]}>
-					{book.prettyName}
+					{book.title}
 				</Text>
 			</Link>
 			<Text style={[styles.text, styles.chapterTitle]}>
-				Chapter {chapterNum}
+				{chapter?.title}
 			</Text>
 			<View style={styles.questionList}>{questionList}</View>
 		</>

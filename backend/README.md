@@ -58,6 +58,9 @@
 -   tests
 -   add tests to deploy process
 
+-   do not allow adding a book already in library
+-   remove books from library?
+
 ## Routes
 
 GET /api/v1/login -- login user

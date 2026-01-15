@@ -74,7 +74,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 	const register = useCallback(async (email: string, password: string) => {
 		try {
-			await userService.register(email, password);
+			const access_token = await userService.register(email, password);
+
+			// Store token and set headers
+			await secureStorage.setItem(TOKEN_KEY, access_token);
+
+			api.defaults.headers.common[
+				"Authorization"
+			] = `Bearer ${access_token}`;
+
+			setIsAuthenticated(true);
 		} catch (error: any) {
 			console.error("Registration failed:", error);
 			throw new Error(
