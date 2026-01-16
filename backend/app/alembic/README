@@ -11,3 +11,6 @@ Generic single-database configuration.
     `alembic upgrade head`
     or with docker
     `docker compose exec backend alembic upgrade head`
+
+-   Seed db (requires some manual editing to seed.py)
+    `docker compose exec backend python ./app/scripts/seed.py`

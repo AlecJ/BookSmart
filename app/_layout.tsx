@@ -23,8 +23,6 @@ function RootLayoutNav() {
 
 		const inPublicGroup = segments[0] === "search";
 
-		console.log(isAuthenticated, inAuthGroup);
-
 		if (!isAuthenticated && !inAuthGroup && !inPublicGroup) {
 			// Redirect to login if not authenticated
 			router.replace("/(auth)/login");

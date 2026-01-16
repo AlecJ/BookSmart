@@ -1,4 +1,4 @@
-import { useBook } from "@/app/read/[bookId]/_layout";
+import { useBooksCtx } from "@/app/contexts/BookContext";
 import FeedbackScore from "@/components/feedbackScore";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
@@ -18,29 +18,78 @@ import {
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const SLIDE_WIDTH = Math.min(SCREEN_WIDTH, 970);
 
+const FEEDBACK_GRADE_MAP: Record<number, string> = {
+	0: "failed",
+	1: "partial_complete",
+	2: "complete",
+};
+
 export default function BookDetailsScreen() {
 	const [showQuestion, setShowQuestion] = useState(true);
-	const [userResponse, setUserResponse] = useState("");
+	// const [userResponse, setUserResponse] = useState("");
 	const [charCount, setCharCount] = useState(0);
-	const initialized = useRef(false);
 	const slideAnim = useRef(new Animated.Value(0)).current;
 	const buttonOpacity = useRef(new Animated.Value(1)).current;
 
-	const { chapterNum, questionNum } = useLocalSearchParams();
-	const { getQuestion } = useBook();
+	const { chapterId, questionId } = useLocalSearchParams();
+	const {
+		isLoadingBookData: isLoading,
+		selectedChapter: chapter,
+		selectedQuestion: question,
+		userResponse,
+		setUserResponse,
+		feedback,
+		getChapter,
+		setSelectedChapter,
+		getChapterQuestion,
+		setSelectedQuestion,
+		getUserResponse,
+		submitUserResponse,
+	} = useBooksCtx();
 
-	const question = getQuestion(Number(chapterNum), Number(questionNum));
+	const feedbackGrade = feedback?.feedback_grade || -1;
 
 	useEffect(() => {
-		if (question?.userResponse && !initialized.current) {
-			setUserResponse(question.userResponse);
-			setCharCount(question.userResponse.length);
-			initialized.current = true;
+		if (!chapter && chapterId) {
+			const chapterToSet = getChapter(chapterId as string);
+			if (chapterToSet) {
+				setSelectedChapter(chapterToSet);
+			}
 		}
-	}, [question?.userResponse]);
+	}, [chapter, chapterId, getChapter, setSelectedChapter]);
+
+	useEffect(() => {
+		if (!question && questionId) {
+			const questionToSet = getChapterQuestion(questionId as string);
+			if (questionToSet) {
+				setSelectedQuestion(questionToSet);
+			}
+		}
+	}, [question, questionId, getChapterQuestion, setSelectedQuestion]);
+
+	useEffect(() => {
+		if (questionId) {
+			getUserResponse(questionId as string);
+		}
+	}, [questionId, getUserResponse]);
+
+	const handleUserSubmit = async () => {
+		if (!userResponse.trim()) {
+			alert("Please enter a response before submitting.");
+			return;
+		}
+
+		const updatedQuestion = await submitUserResponse(userResponse);
+		setSelectedQuestion(updatedQuestion);
+
+		slideToFeedback();
+		// TODO make user wait while scoring occurs, or move to score screen
+	};
+
+	console.log(feedback);
 
 	// Show loading indicator while book is being fetched
-	if (!question) {
+	if (!question || isLoading) {
 		return (
 			<View style={[styles.container, styles.loadingContainer]}>
 				<ActivityIndicator size="large" color="#0e162d" />
@@ -94,7 +143,6 @@ export default function BookDetailsScreen() {
 
 	const questionScreen = (
 		<>
-			<Text style={styles.questionText}>{question?.text}</Text>
 			<TextInput
 				style={styles.userResponseInput}
 				onChangeText={(text) => {
@@ -112,20 +160,29 @@ export default function BookDetailsScreen() {
 				{charCount}/1000
 			</Text>
 			<View style={styles.submitResponseBtn}>
-				<Button title="Submit Response" onPress={() => {}} />
+				<Button title="Submit Response" onPress={handleUserSubmit} />
 			</View>
 		</>
 	);
 
-	const feedbackScreen = (
+	const feedbackScreen = !feedback ? (
+		<View style={[styles.container, styles.loadingContainer]}>
+			<ActivityIndicator size="large" color="#0e162d" />
+		</View>
+	) : (
 		<>
-			<Text style={styles.questionText}>{question?.text}</Text>
-			<FeedbackScore status={"complete"} />
+			<Text style={styles.feedbackText}>{feedback?.feedback_text}</Text>
+			<FeedbackScore
+				style={styles.feedbackGrade}
+				status={FEEDBACK_GRADE_MAP[feedbackGrade]}
+			/>
 		</>
 	);
 
 	return (
 		<View style={styles.container}>
+			<Text style={styles.questionText}>{question?.question_text}</Text>
+
 			<Animated.View
 				style={[
 					styles.slideContainer,
@@ -143,16 +200,18 @@ export default function BookDetailsScreen() {
 								{ opacity: buttonOpacity },
 							]}
 						>
-							<Pressable onPress={slideToFeedback}>
-								<Text style={styles.viewFeedbackText}>
-									View Feedback
-								</Text>
-								<Ionicons
-									style={styles.viewFeedbackChevron}
-									name="chevron-forward"
-									size={30}
-								/>
-							</Pressable>
+							{!!feedback && (
+								<Pressable onPress={slideToFeedback}>
+									<Text style={styles.viewFeedbackText}>
+										View Feedback
+									</Text>
+									<Ionicons
+										style={styles.viewFeedbackChevron}
+										name="chevron-forward"
+										size={30}
+									/>
+								</Pressable>
+							)}
 						</Animated.View>
 					)}
 				</View>
@@ -191,6 +250,15 @@ const styles = StyleSheet.create({
 		overflow: "hidden",
 		marginHorizontal: -20,
 	},
+	questionText: {
+		color: "#0e162d",
+		fontSize: 22,
+		fontWeight: 400,
+		marginTop: 30,
+		width: "80%",
+		marginLeft: "10%",
+		marginRight: "10%",
+	},
 	slideContainer: {
 		flexDirection: "row",
 		width: SLIDE_WIDTH * 2,
@@ -201,12 +269,19 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		flex: 1,
 	},
-	questionText: {
+	feedbackText: {
 		color: "#0e162d",
-		fontSize: 22,
-		fontWeight: 400,
-		marginTop: 30,
+		backgroundColor: "#ffffff5a",
+		fontSize: 18,
+		fontWeight: 300,
+		marginTop: 24,
+		padding: 8,
 		width: "80%",
+	},
+	feedbackGrade: {
+		marginTop: 50,
+		height: 20,
+		width: 200,
 	},
 	userResponseInput: {
 		backgroundColor: "#ffffffb3",

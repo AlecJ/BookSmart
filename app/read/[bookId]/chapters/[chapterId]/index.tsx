@@ -1,11 +1,10 @@
 import { useBooksCtx } from "@/app/contexts/BookContext";
 import ChapterBtn from "@/components/chapterBtn";
 import { Link, router, useLocalSearchParams } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import {
 	ActivityIndicator,
 	Platform,
-	Pressable,
 	ScrollView,
 	StyleSheet,
 	Text,
@@ -18,21 +17,37 @@ export default function BookDetailsScreen() {
 		selectedBook: book,
 		selectedChapter: chapter,
 		getChapter,
+		getOrGenerateChapterQuestions,
 		setSelectedChapter,
 		setSelectedQuestion,
 	} = useBooksCtx();
 	const questions = chapter?.questions || [];
-	console.log(chapter);
+	const hasFetchedRef = useRef<string | null>(null);
 
 	useEffect(() => {
-		if (!chapter) {
+		if (!chapter && chapterId) {
 			const chapterToSet = getChapter(chapterId as string);
-			setSelectedChapter(chapterToSet);
+			if (chapterToSet) {
+				setSelectedChapter(chapterToSet);
+			}
 		}
 	}, [chapter, chapterId, getChapter, setSelectedChapter]);
 
+	useEffect(() => {
+		if (
+			chapter &&
+			chapterId &&
+			(!chapter.questions || chapter.questions.length === 0) &&
+			hasFetchedRef.current !== chapterId
+		) {
+			console.log("Fetching questions for chapter:", chapterId);
+			hasFetchedRef.current = chapterId as string;
+			getOrGenerateChapterQuestions(chapterId as string);
+		}
+	}, [chapter, chapterId, getOrGenerateChapterQuestions]);
+
 	// Show loading indicator while book is being fetched
-	if (!book) {
+	if (!book || !chapter || !chapter.questions) {
 		return (
 			<View style={[styles.container, styles.loadingContainer]}>
 				<ActivityIndicator size="large" color="#0e162d" />
@@ -48,16 +63,13 @@ export default function BookDetailsScreen() {
 	const isWeb = Platform.OS === "web";
 
 	const questionList = questions.map((question) => (
-		<Pressable
+		<ChapterBtn
 			key={question.id}
 			onPress={() => handleQuestionBtn(question)}
-		>
-			<ChapterBtn
-				style={styles.questionBtn}
-				title={question.text}
-				status={question.status}
-			/>
-		</Pressable>
+			style={styles.questionBtn}
+			title={question.question_text}
+			status={question.status || "incomplete"}
+		/>
 	));
 
 	const content = (

@@ -3,7 +3,7 @@ from sqlmodel import Session, select
 from sqlalchemy.exc import IntegrityError
 
 from app.models import (User, UserBookLink, Book, BookChapter, BookChapterCreate,
-                        ChapterQuestionCreate, ChapterQuestion)
+                        ChapterQuestionCreate, ChapterQuestion, UserResponse)
 
 
 '''
@@ -81,11 +81,7 @@ def create_book_chapter(*, session: Session, chapter_in: BookChapterCreate, book
     db_book_chapter = BookChapter.model_validate(
         chapter_in, update={"book_id": book_id})
     session.add(db_book_chapter)
-    try:
-        session.commit()
-    except IntegrityError as e:
-        session.rollback()
-        raise e
+    session.commit()
     session.refresh(db_book_chapter)
     return db_book_chapter
 
@@ -96,7 +92,7 @@ def get_book_chapters(*, session: Session) -> list[Book]:
     return books
 
 
-def get_book_chapter_by_id(*, session: Session, chapter_id: int) -> BookChapter | None:
+def get_book_chapter_by_id(*, session: Session, chapter_id: uuid.UUID) -> BookChapter | None:
     statement = select(BookChapter).where(BookChapter.id == chapter_id)
     book = session.exec(statement).first()
     return book
@@ -117,16 +113,43 @@ CRUD operations for ChapterQuestion'''
 # region ChapterQuestionCRUD
 
 
+def get_chapter_question_by_id(*, session: Session, question_id: uuid.UUID) -> ChapterQuestion | None:
+    statement = select(ChapterQuestion).where(
+        ChapterQuestion.id == question_id)
+    question = session.exec(statement).first()
+    return question
+
+
 def create_chapter_question(*, session: Session, question_in: ChapterQuestionCreate, chapter_id: uuid.UUID) -> ChapterQuestion:
     db_question = ChapterQuestion.model_validate(
         question_in, update={"chapter_id": chapter_id})
     session.add(db_question)
-    try:
-        session.commit()
-    except IntegrityError as e:
-        session.rollback()
-        raise e
+    session.commit()
     session.refresh(db_question)
     return db_question
 
 # endregion ChapterQuestionCRUD
+
+
+'''
+CRUD operations for QuestionResponse'''
+# region QuestionResponseCRUD
+
+
+def get_user_response_for_question(*, session: Session, user_id: uuid.UUID, question_id: uuid.UUID) -> UserResponse | None:
+    statement = select(UserResponse).where(UserResponse.user_id == user_id,
+                                           UserResponse.question_id == question_id)
+    user_response = session.exec(statement).first()
+    return user_response
+
+
+def create_user_response(*, session: Session, question_id: uuid.UUID, user_id: uuid.UUID, response_text: str) -> UserResponse:
+    user_response = UserResponse(
+        question_id=question_id,
+        user_id=user_id,
+        response_text=response_text
+    )
+    session.add(user_response)
+    session.commit()
+    session.refresh(user_response)
+    return user_response

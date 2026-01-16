@@ -1,28 +1,43 @@
-import { BookChapterType, BookQuestionType, BookType } from "@/types";
+import {
+	BookChapterType,
+	BookQuestionType,
+	BookType,
+	UserResponseType,
+} from "@/types";
 import React, { createContext, useCallback, useEffect, useState } from "react";
 import { bookService } from "../services/bookService";
 import { preloadImages } from "../utils/imageCache";
 import { useAuth } from "./AuthContext";
 
 interface BookContextType {
+	isLoadingBookData: boolean;
 	selectedBook?: BookType;
 	selectedChapter?: BookChapterType;
 	setSelectedChapter: (chapter: BookChapterType | undefined) => void;
 	selectedQuestion?: BookQuestionType;
 	setSelectedQuestion: (question: BookQuestionType | undefined) => void;
+	userResponse: string;
+	setUserResponse: (userResponse: string) => void;
+	feedback: UserResponseType | undefined;
+	setFeedback: (feedback: UserResponseType | undefined) => void;
 	books: BookType[];
 	searchBookResults: BookType[];
 	getUserBooks: () => Promise<void>;
 	getUserBookData: (bookId: string) => Promise<void>;
 	getChapter: (chapterTitle: string) => BookChapterType | undefined;
+	getOrGenerateChapterQuestions: (chapterId: string) => Promise<void>;
+	getChapterQuestion: (questionId: string) => BookQuestionType | undefined;
 	searchBooks: (query: string) => Promise<void>;
 	viewSearchResultBook?: (bookId: string) => Promise<void>;
 	addBookToLibrary: (book: BookType) => Promise<void>;
+	getUserResponse: (questionId: string) => Promise<void>;
+	submitUserResponse: (response: string) => Promise<void>;
 }
 
 const BookContext = createContext<BookContextType | undefined>(undefined);
 
 export function BookProvider({ children }: { children: React.ReactElement }) {
+	const [isLoadingBookData, setIsLoadingBookData] = useState(false);
 	const [selectedBook, setSelectedBook] = useState<BookType | undefined>(
 		undefined
 	);
@@ -32,6 +47,10 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 	const [selectedQuestion, setSelectedQuestion] = useState<
 		BookQuestionType | undefined
 	>(undefined);
+	const [userResponse, setUserResponse] = useState<string>("");
+	const [feedback, setFeedback] = useState<UserResponseType | undefined>(
+		undefined
+	);
 	const [books, setBooks] = useState<BookType[]>([]);
 	const [searchBookResults, setSearchBooks] = useState<BookType[]>([]);
 	const { isLoading, isAuthenticated } = useAuth();
@@ -141,22 +160,91 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 		);
 	};
 
+	const getOrGenerateChapterQuestions = useCallback(
+		async (chapterId: string) => {
+			try {
+				const chapter = await bookService.getOrGenerateChapterQuestions(
+					chapterId
+				);
+				setSelectedChapter(chapter);
+			} catch (error: any) {
+				console.error("Failed to retrieve chapter questions:", error);
+				throw new Error(
+					error.response?.data?.detail ||
+						"Failed to retrieve chapter questions."
+				);
+			}
+		},
+		[isAuthenticated]
+	);
+
+	const getChapterQuestion = (questionId: string) => {
+		if (!selectedChapter) return;
+
+		return (selectedChapter?.questions || []).find(
+			(question) => String(question.id) === questionId
+		);
+	};
+
+	const getUserResponse = useCallback(
+		async (questionId: string) => {
+			try {
+				setIsLoadingBookData(true);
+				const userResponse = await bookService.getUserResponse(
+					questionId
+				);
+				setUserResponse(userResponse?.response_text || "");
+				setFeedback(userResponse);
+			} catch (error: any) {
+				setUserResponse("");
+				setFeedback(undefined);
+			} finally {
+				setIsLoadingBookData(false);
+			}
+		},
+		[isAuthenticated, selectedQuestion]
+	);
+
+	const submitUserResponse = useCallback(
+		async (userResponse: string) => {
+			try {
+				const newUserResponse = await bookService.submitUserResponse(
+					selectedQuestion?.id,
+					userResponse
+				);
+				setFeedback(newUserResponse);
+			} catch (error: any) {
+				return;
+			}
+		},
+		[isAuthenticated, selectedQuestion]
+	);
+
 	return (
 		<BookContext.Provider
 			value={{
+				isLoadingBookData,
 				selectedBook,
 				selectedChapter,
 				setSelectedChapter,
 				selectedQuestion,
 				setSelectedQuestion,
+				userResponse,
+				setUserResponse,
+				feedback,
+				setFeedback,
 				books,
 				searchBookResults,
 				getUserBookData,
 				getUserBooks,
 				getChapter,
+				getOrGenerateChapterQuestions,
+				getChapterQuestion,
 				searchBooks,
 				viewSearchResultBook,
 				addBookToLibrary,
+				getUserResponse,
+				submitUserResponse,
 			}}
 		>
 			{children}

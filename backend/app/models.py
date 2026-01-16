@@ -80,7 +80,7 @@ class BookChapterPublic(BookChapterBase):
     id: uuid.UUID
     book_id: uuid.UUID
     status: str | None
-    # questions: list["ChapterQuestionPublic"] = []
+    questions: list["ChapterQuestionPublic"] = []
 
 
 class BookWithChapters(SQLModel):
@@ -105,25 +105,33 @@ class ChapterQuestion(ChapterQuestionBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     chapter_id: uuid.UUID = Field(foreign_key="bookchapter.id")
     chapter: BookChapter = Relationship(back_populates="questions")
-    responses: list["UserResponse"] = Relationship(
-        back_populates="question", cascade_delete=True)
 
 
 class ChapterQuestionPublic(ChapterQuestionBase):
     id: uuid.UUID
     chapter_id: uuid.UUID
-    responses: list["UserResponsePublic"]
+
+
+class UserResponseCreate(SQLModel):
+    response_text: str = Field(max_length=1000)
 
 
 class UserResponse(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    user_id: uuid.UUID = Field(foreign_key="user.id")
+    user_id: uuid.UUID = Field(foreign_key="user.id", ondelete="CASCADE")
     user: User = Relationship()
-    question_id: uuid.UUID = Field(foreign_key="chapterquestion.id")
-    question: ChapterQuestion = Relationship(back_populates="responses")
+    question_id: uuid.UUID = Field(
+        foreign_key="chapterquestion.id", ondelete="CASCADE")
+    question: ChapterQuestion = Relationship()
     response_text: str = Field()
-    feedback_text: str = Field()
-    feedback_grade: int = Field()  # 0 = incorrect, 1 = partially correct, 2 = correct
+    feedback_text: str = Field(nullable=True)
+    # 0 = incorrect, 1 = partially correct, 2 = correct
+    feedback_grade: int = Field(nullable=True)
+
+
+class UserResponseFeedback(SQLModel):
+    feedback_text: str
+    feedback_grade: int
 
 
 class UserResponsePublic(SQLModel):
@@ -131,8 +139,8 @@ class UserResponsePublic(SQLModel):
     user_id: uuid.UUID
     question_id: uuid.UUID
     response_text: str
-    feedback_text: str
-    feedback_grade: int
+    feedback_text: str | None
+    feedback_grade: int | None
 
 
 class Token(SQLModel):
