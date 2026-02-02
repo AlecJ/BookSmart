@@ -2,7 +2,7 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { useBooksCtx } from "@/app/contexts/BookContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Link, router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
 export default function Header() {
@@ -20,6 +20,18 @@ export default function Header() {
 			router.push("/search");
 		}
 	};
+
+	// Automatic search with 500ms debounce
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			if (searchQuery.trim()) {
+				searchBooks(searchQuery);
+				router.push("/search");
+			}
+		}, 500);
+
+		return () => clearTimeout(timer);
+	}, [searchQuery]);
 
 	return (
 		<View style={styles.header}>

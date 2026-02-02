@@ -28,6 +28,7 @@ interface BookContextType {
 	getOrGenerateChapterQuestions: (chapterId: string) => Promise<void>;
 	getChapterQuestion: (questionId: string) => BookQuestionType | undefined;
 	searchBooks: (query: string) => Promise<void>;
+	isSearching?: boolean;
 	viewSearchResultBook?: (bookId: string) => Promise<void>;
 	addBookToLibrary: (book: BookType) => Promise<void>;
 	getUserResponse: (questionId: string) => Promise<void>;
@@ -39,7 +40,7 @@ const BookContext = createContext<BookContextType | undefined>(undefined);
 export function BookProvider({ children }: { children: React.ReactElement }) {
 	const [isLoadingBookData, setIsLoadingBookData] = useState(false);
 	const [selectedBook, setSelectedBook] = useState<BookType | undefined>(
-		undefined
+		undefined,
 	);
 	const [selectedChapter, setSelectedChapter] = useState<
 		BookChapterType | undefined
@@ -49,10 +50,11 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 	>(undefined);
 	const [userResponse, setUserResponse] = useState<string>("");
 	const [feedback, setFeedback] = useState<UserResponseType | undefined>(
-		undefined
+		undefined,
 	);
 	const [books, setBooks] = useState<BookType[]>([]);
 	const [searchBookResults, setSearchBooks] = useState<BookType[]>([]);
+	const [isSearching, setIsSeraching] = useState<boolean>(false);
 	const { isLoading, isAuthenticated } = useAuth();
 
 	useEffect(() => {
@@ -79,7 +81,8 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 		} catch (error: any) {
 			console.error("Failed to retrieve user books:", error);
 			throw new Error(
-				error.response?.data?.detail || "Failed to retrieve user books."
+				error.response?.data?.detail ||
+					"Failed to retrieve user books.",
 			);
 		}
 	}, [isAuthenticated]);
@@ -94,15 +97,16 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 				console.error("Failed to retrieve book data:", error);
 				throw new Error(
 					error.response?.data?.detail ||
-						"Failed to retrieve book data."
+						"Failed to retrieve book data.",
 				);
 			}
 		},
-		[isAuthenticated]
+		[isAuthenticated],
 	);
 
 	const searchBooks = useCallback(async (query: string) => {
 		try {
+			setIsSeraching(true);
 			const results = await bookService.searchBooks(query);
 
 			// Preload search result images into cache BEFORE setting state
@@ -114,10 +118,11 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 			}
 
 			setSearchBooks(results);
+			setIsSeraching(false);
 		} catch (error: any) {
 			console.error("Book search failed:", error);
 			throw new Error(
-				error.response?.data?.detail || "Book search failed."
+				error.response?.data?.detail || "Book search failed.",
 			);
 		}
 	}, []);
@@ -130,7 +135,7 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 			console.error("Failed to retrieve book details:", error);
 			throw new Error(
 				error.response?.data?.detail ||
-					"Failed to retrieve book details."
+					"Failed to retrieve book details.",
 			);
 		}
 	}, []);
@@ -145,44 +150,43 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 				console.error("Failed to add book to library:", error);
 				throw new Error(
 					error.response?.data?.detail ||
-						"Failed to add book to library."
+						"Failed to add book to library.",
 				);
 			}
 		},
-		[isAuthenticated]
+		[isAuthenticated],
 	);
 
 	const getChapter = (chapterId: string) => {
 		if (!selectedBook) return;
 
 		return (selectedBook?.chapters || []).find(
-			(chapter) => String(chapter.id) === chapterId
+			(chapter) => String(chapter.id) === chapterId,
 		);
 	};
 
 	const getOrGenerateChapterQuestions = useCallback(
 		async (chapterId: string) => {
 			try {
-				const chapter = await bookService.getOrGenerateChapterQuestions(
-					chapterId
-				);
+				const chapter =
+					await bookService.getOrGenerateChapterQuestions(chapterId);
 				setSelectedChapter(chapter);
 			} catch (error: any) {
 				console.error("Failed to retrieve chapter questions:", error);
 				throw new Error(
 					error.response?.data?.detail ||
-						"Failed to retrieve chapter questions."
+						"Failed to retrieve chapter questions.",
 				);
 			}
 		},
-		[isAuthenticated]
+		[isAuthenticated],
 	);
 
 	const getChapterQuestion = (questionId: string) => {
 		if (!selectedChapter) return;
 
 		return (selectedChapter?.questions || []).find(
-			(question) => String(question.id) === questionId
+			(question) => String(question.id) === questionId,
 		);
 	};
 
@@ -190,9 +194,8 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 		async (questionId: string) => {
 			try {
 				setIsLoadingBookData(true);
-				const userResponse = await bookService.getUserResponse(
-					questionId
-				);
+				const userResponse =
+					await bookService.getUserResponse(questionId);
 				setUserResponse(userResponse?.response_text || "");
 				setFeedback(userResponse);
 			} catch (error: any) {
@@ -202,7 +205,7 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 				setIsLoadingBookData(false);
 			}
 		},
-		[isAuthenticated, selectedQuestion]
+		[isAuthenticated, selectedQuestion],
 	);
 
 	const submitUserResponse = useCallback(
@@ -210,14 +213,14 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 			try {
 				const newUserResponse = await bookService.submitUserResponse(
 					selectedQuestion?.id,
-					userResponse
+					userResponse,
 				);
 				setFeedback(newUserResponse);
 			} catch (error: any) {
 				return;
 			}
 		},
-		[isAuthenticated, selectedQuestion]
+		[isAuthenticated, selectedQuestion],
 	);
 
 	return (
@@ -241,6 +244,7 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 				getOrGenerateChapterQuestions,
 				getChapterQuestion,
 				searchBooks,
+				isSearching,
 				viewSearchResultBook,
 				addBookToLibrary,
 				getUserResponse,
