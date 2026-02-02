@@ -25,6 +25,17 @@ async def search_books(*, q: str) -> list[Book]:
 
     async with httpx.AsyncClient() as client:
         response = await client.get(url, params=params)
+
+        print(response.status_code)
+
+        # handle invalid API key
+        if response.status_code == 403:
+            raise HTTPException(
+                status_code=500, detail="Invalid Google API key.")
+        if response.status_code != 200:
+            raise HTTPException(
+                status_code=response.status_code, detail="Error fetching data from Google Books API.")
+
         books = response.json().get('items', [])
 
         results = []
