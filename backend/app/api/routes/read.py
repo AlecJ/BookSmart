@@ -1,12 +1,13 @@
 import uuid
 from fastapi import APIRouter, HTTPException
-from sqlalchemy.exc import IntegrityError
+# from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
 
 from app.api.deps import SessionDep, CurrentUser
 from app import crud
 from app.services.openai_service import generate_chapter_question, evaluate_user_response
+from app.api.helpers import add_computed_status_to_chapter_questions
 from app.models import (User, Book, UserBookLink, BookWithChapters, BookChapter,
                         ChapterQuestion, BookChapterPublic, ChapterQuestionCreate, ChapterQuestionPublic, UserResponseCreate)
 
@@ -68,7 +69,14 @@ def get_book_details_for_user(*, session: SessionDep, current_user: CurrentUser,
     if not user_book:
         raise HTTPException(status_code=404, detail="Book not found")
 
-    # Build response with status set to 'complete' for all chapters
+    # Compute user's current status for all chapters
+    chapters_with_status = []
+    for chapter in user_book.chapters:
+        chapter_with_status = add_computed_status_to_chapter_questions(
+            session=session, current_user=current_user, chapter=chapter)
+
+        chapters_with_status.append(chapter_with_status)
+
     return BookWithChapters(
         id=user_book.id,
         google_book_id=user_book.google_book_id,
@@ -76,16 +84,7 @@ def get_book_details_for_user(*, session: SessionDep, current_user: CurrentUser,
         author=user_book.author,
         description=user_book.description,
         image_url=user_book.image_url,
-        chapters=[
-            {
-                "id": chapter.id,
-                "book_id": chapter.book_id,
-                "title": chapter.title,
-                "status": "incomplete",
-                "questions": chapter.questions,
-            }
-            for chapter in user_book.chapters
-        ]
+        chapters=chapters_with_status
     )
 
 
@@ -134,12 +133,12 @@ async def get_or_generate_chapter_questions(*, session: SessionDep, current_user
 
     # If questions already exist, return them
     if chapter.questions:
-        return chapter
+        return add_computed_status_to_chapter_questions(
+            session=session, current_user=current_user, chapter=chapter)
 
     # Otherwise, generate questions using OpenAI service
     questions = await generate_chapter_question(session=session, chapter_id=chapter_id)
     # split questions and create ChapterQuestion entries for each
-    print(questions)
     for question in questions.split('\n'):
         question_in = ChapterQuestionCreate(
             question_text=question.strip('- ').strip()
@@ -149,9 +148,9 @@ async def get_or_generate_chapter_questions(*, session: SessionDep, current_user
 
     session.refresh(chapter)
     questions_with_status = [ChapterQuestionPublic(
-        from_orm=q, status="incomplete") for q in chapter.questions]
+        **q.model_dump(), status=None) for q in chapter.questions]
 
-    return BookChapterPublic(from_orm=chapter, status="complete", questions=questions_with_status)
+    return BookChapterPublic(**chapter.model_dump(), status=None, questions=questions_with_status)
 
 
 @router.get('/question/{question_id}')

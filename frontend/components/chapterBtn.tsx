@@ -3,22 +3,18 @@ import { Pressable, PressableProps, StyleSheet, Text } from "react-native";
 
 type Props = {
 	title: string;
-	status: string;
+	status: number | null;
 	style: PressableProps["style"];
 };
 
-enum Status {
-	INCOMPLETE = "incomplete",
-	FAILED = "failed",
-	PARTIAL_COMPLETE = "partial_complete",
-	COMPLETE = "complete",
-}
-
-const STATUS_ICON_MAP: Record<Status, keyof typeof Ionicons.glyphMap> = {
-	[Status.INCOMPLETE]: { name: "ellipse-outline", color: "" },
-	[Status.FAILED]: { name: "close-circle", color: "#f53636ff" },
-	[Status.PARTIAL_COMPLETE]: { name: "checkmark-circle", color: "#e5ab17ff" },
-	[Status.COMPLETE]: { name: "checkmark-circle", color: "#14af1eff" },
+const STATUS_ICON_MAP: Record<
+	string,
+	{ name: keyof typeof Ionicons.glyphMap; color: string }
+> = {
+	null: { name: "ellipse-outline", color: "#999" },
+	"0": { name: "close-circle", color: "#f53636ff" },
+	"1": { name: "checkmark-circle", color: "#e5ab17ff" },
+	"2": { name: "checkmark-circle", color: "#14af1eff" },
 };
 
 export default function ChapterBtn({
@@ -27,7 +23,8 @@ export default function ChapterBtn({
 	style,
 	...props
 }: PressableProps & Props) {
-	const icon = STATUS_ICON_MAP[status];
+	const statusKey = status === null ? "null" : String(status);
+	const icon = STATUS_ICON_MAP[statusKey];
 
 	return (
 		<Pressable style={[styles.container, style]} {...props}>

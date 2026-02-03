@@ -79,7 +79,7 @@ class BookChapter(BookChapterBase, table=True):
 class BookChapterPublic(BookChapterBase):
     id: uuid.UUID
     book_id: uuid.UUID
-    status: str | None
+    status: int | None
     questions: list["ChapterQuestionPublic"] = []
 
 
@@ -110,6 +110,7 @@ class ChapterQuestion(ChapterQuestionBase, table=True):
 class ChapterQuestionPublic(ChapterQuestionBase):
     id: uuid.UUID
     chapter_id: uuid.UUID
+    status: int | None
 
 
 class UserResponseCreate(SQLModel):
@@ -125,7 +126,7 @@ class UserResponse(SQLModel, table=True):
     question: ChapterQuestion = Relationship()
     response_text: str = Field()
     feedback_text: str = Field(nullable=True)
-    # 0 = incorrect, 1 = partially correct, 2 = correct
+    # grade: 0 = failed, 1 = partial, 2 = correct
     feedback_grade: int = Field(nullable=True)
 
 

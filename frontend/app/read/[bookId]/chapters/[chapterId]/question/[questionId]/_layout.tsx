@@ -3,7 +3,7 @@ import { Slot, Tabs } from "expo-router";
 import { Platform, StyleSheet, View } from "react-native";
 
 export default function TabLayout() {
-	const questionHasFeedback = true;
+	const questionHasFeedback = true; //todo get from context
 
 	if (Platform.OS === "web") {
 		return (

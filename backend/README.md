@@ -2,64 +2,44 @@
 
 ## Requirements
 
--   Docker
--   uv
+- Docker
+- uv
 
 ## Run Locally
 
--   Copy `.env.EXAMPLE` and name it `.env`
+- Copy `.env.EXAMPLE` and name it `.env`
 
--   (Optional) Update the postgres admin user, password, or app name, in your new `.env` file.
+- (Optional) Update the postgres admin user, password, or app name, in your new `.env` file.
 
--   Bring up containers
-    `docker-compose up`
+- Bring up containers
+  `docker-compose up`
 
     Visit site at ...
 
 ## Useful Commands
 
--   Set up local virtualenv
-    `uv venv`
-    `source .venv/bin/activate`
-    `uv sync`
+- Set up local virtualenv
+  `uv venv`
+  `source .venv/bin/activate`
+  `uv sync`
 
--   Update the projects environment
-    `uv add [package]`
-    `uv lock`
-    `uv sync`
+- Update the projects environment
+  `uv add [package]`
+  `uv lock`
+  `uv sync`
 
--   Create a db migration
-    `alembic revision --autogenerate -m "message"`
-    or with docker
-    `docker compose exec backend alembic revision --autogenerate -m "message"`
+- Create a db migration
+  `alembic revision --autogenerate -m "message"`
+  or with docker
+  `docker compose exec backend alembic revision --autogenerate -m "message"`
 
--   Apply a db migration
-    `alembic upgrade head`
-    or with docker
-    `docker compose exec backend alembic upgrade head`
+- Apply a db migration
+  `alembic upgrade head`
+  or with docker
+  `docker compose exec backend alembic upgrade head`
 
--   Clear local database
-    `docker compose down -v  # Removes volumes`
-
-## To Do
-
--   get questions (auto)
--   submit response
--   redo login/register page
--   recent books on homepage
-
--   test on web
--   catch ios up to web
--   polish frontends
--   test very big resolution
-
--   seed script
--   deploy
--   tests
--   add tests to deploy process
-
--   do not allow adding a book already in library
--   remove books from library?
+- Clear local database
+  `docker compose down -v  # Removes volumes`
 
 ## Routes
 

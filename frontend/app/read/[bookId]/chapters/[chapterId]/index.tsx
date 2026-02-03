@@ -24,6 +24,7 @@ export default function BookDetailsScreen() {
 	const questions = chapter?.questions || [];
 	const hasFetchedRef = useRef<string | null>(null);
 
+	// Fetch chapter if not already set (page reload)
 	useEffect(() => {
 		if (!chapter && chapterId) {
 			const chapterToSet = getChapter(chapterId as string);
@@ -33,6 +34,7 @@ export default function BookDetailsScreen() {
 		}
 	}, [chapter, chapterId, getChapter, setSelectedChapter]);
 
+	// Fetch questions for chapter
 	useEffect(() => {
 		if (
 			chapter &&
@@ -40,7 +42,6 @@ export default function BookDetailsScreen() {
 			(!chapter.questions || chapter.questions.length === 0) &&
 			hasFetchedRef.current !== chapterId
 		) {
-			console.log("Fetching questions for chapter:", chapterId);
 			hasFetchedRef.current = chapterId as string;
 			getOrGenerateChapterQuestions(chapterId as string);
 		}
@@ -68,7 +69,7 @@ export default function BookDetailsScreen() {
 			onPress={() => handleQuestionBtn(question)}
 			style={styles.questionBtn}
 			title={question.question_text}
-			status={question.status || "incomplete"}
+			status={question.status}
 		/>
 	));
 

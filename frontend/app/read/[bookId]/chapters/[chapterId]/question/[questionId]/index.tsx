@@ -18,6 +18,7 @@ import {
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const SLIDE_WIDTH = Math.min(SCREEN_WIDTH, 970);
 
+// todo remove
 const FEEDBACK_GRADE_MAP: Record<number, string> = {
 	0: "failed",
 	1: "partial_complete",
@@ -26,6 +27,7 @@ const FEEDBACK_GRADE_MAP: Record<number, string> = {
 
 export default function BookDetailsScreen() {
 	const [showQuestion, setShowQuestion] = useState(true);
+	const [showFeedback, setShowFeedback] = useState(true);
 	// const [userResponse, setUserResponse] = useState("");
 	const [charCount, setCharCount] = useState(0);
 	const slideAnim = useRef(new Animated.Value(0)).current;
@@ -47,7 +49,7 @@ export default function BookDetailsScreen() {
 		submitUserResponse,
 	} = useBooksCtx();
 
-	const feedbackGrade = feedback?.feedback_grade || -1;
+	const feedbackGrade = feedback?.feedback_grade || null;
 
 	useEffect(() => {
 		if (!chapter && chapterId) {
@@ -79,14 +81,14 @@ export default function BookDetailsScreen() {
 			return;
 		}
 
-		const updatedQuestion = await submitUserResponse(userResponse);
-		setSelectedQuestion(updatedQuestion);
-
+		// hide previous feedback
+		setShowFeedback(false);
 		slideToFeedback();
-		// TODO make user wait while scoring occurs, or move to score screen
-	};
 
-	console.log(feedback);
+		submitUserResponse(userResponse);
+		setShowFeedback(true);
+		// setSelectedQuestion(updatedQuestion);
+	};
 
 	// Show loading indicator while book is being fetched
 	if (!question || isLoading) {
@@ -165,19 +167,22 @@ export default function BookDetailsScreen() {
 		</>
 	);
 
-	const feedbackScreen = !feedback ? (
-		<View style={[styles.container, styles.loadingContainer]}>
-			<ActivityIndicator size="large" color="#0e162d" />
-		</View>
-	) : (
-		<>
-			<Text style={styles.feedbackText}>{feedback?.feedback_text}</Text>
-			<FeedbackScore
-				style={styles.feedbackGrade}
-				status={FEEDBACK_GRADE_MAP[feedbackGrade]}
-			/>
-		</>
-	);
+	const feedbackScreen =
+		!feedback || !showFeedback ? (
+			<View style={[styles.container, styles.loadingContainer]}>
+				<ActivityIndicator size="large" color="#0e162d" />
+			</View>
+		) : (
+			<>
+				<Text style={styles.feedbackText}>
+					{feedback?.feedback_text}
+				</Text>
+				<FeedbackScore
+					style={styles.feedbackGrade}
+					status={FEEDBACK_GRADE_MAP[feedbackGrade]}
+				/>
+			</>
+		);
 
 	return (
 		<View style={styles.container}>

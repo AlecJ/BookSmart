@@ -20,7 +20,7 @@ export interface BookChapterType {
 	id: number;
 	book_id: string;
 	title: string;
-	status?: string;
+	status?: null | 0 | 1 | 2;
 	questions?: BookQuestionType[];
 }
 
@@ -29,6 +29,7 @@ export interface BookQuestionType {
 	chapter_id: string;
 	question_text: string;
 	userResponse?: UserResponseType;
+	status?: null | 0 | 1 | 2;
 }
 
 export interface UserResponseType {
