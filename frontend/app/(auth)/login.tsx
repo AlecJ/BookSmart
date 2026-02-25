@@ -2,7 +2,6 @@ import { Link, router } from "expo-router";
 import React, { useState } from "react";
 import {
 	ActivityIndicator,
-	Alert,
 	StyleSheet,
 	Text,
 	TextInput,
@@ -14,12 +13,13 @@ import { useAuth } from "../contexts/AuthContext";
 export default function LoginScreen() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [errorMsg, setErrorMsg] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const { login } = useAuth();
 
 	const handleLogin = async () => {
 		if (!email || !password) {
-			Alert.alert("Error", "Please enter both email and password");
+			setErrorMsg("Please enter both email and password");
 			return;
 		}
 
@@ -28,8 +28,8 @@ export default function LoginScreen() {
 			await login(email, password);
 			// Navigation will be handled automatically by the auth check
 			router.replace("/(tabs)");
-		} catch (error: any) {
-			Alert.alert("Login Failed", error.message || "Invalid credentials");
+		} catch {
+			setErrorMsg("Incorrect email or password");
 		} finally {
 			setIsLoading(false);
 		}
@@ -40,6 +40,8 @@ export default function LoginScreen() {
 			<View style={styles.form}>
 				<Text style={styles.title}>Welcome to BookSmart</Text>
 				<Text style={styles.subtitle}>Sign in to continue</Text>
+
+				{errorMsg && <Text style={styles.errorText}>{errorMsg}</Text>}
 
 				<TextInput
 					style={styles.input}
@@ -148,5 +150,10 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		marginTop: 20,
 		fontSize: 14,
+	},
+	errorText: {
+		color: "red",
+		textAlign: "center",
+		marginBottom: 15,
 	},
 });

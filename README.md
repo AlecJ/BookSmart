@@ -34,3 +34,4 @@ See individual README in frontend/ and backend/ for info on running each.
 
 - do not allow adding a book already in library
 - remove books from library?
+- mark section as complete
