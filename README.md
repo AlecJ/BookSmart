@@ -13,16 +13,22 @@ See individual README in frontend/ and backend/ for info on running each.
 
 ## ToDo
 
+- after receiving feedback, go back to the question list: grade is not updated
+
+- how is a question with no text getting into the db
+- how do I handle the error gracefully
+- the call takes a number of questions and if fewer than two questions exist, get up to 3 questions
+- retry immediately?
+
+- error when question text is blank (handle gracefully)
+- login error text if backend is down
+- telemetry for requests
+
 - timeout on question submit
 - hide feedback until new feedback is in
 - update grade on chapter view
 
-- loading if generating questions
-
-- telemetry for requests
-
 - redo login/register page
-- error text if login fails (or backend is down)
 
 - polish frontends
 - test very big resolution
@@ -35,3 +41,6 @@ See individual README in frontend/ and backend/ for info on running each.
 - do not allow adding a book already in library
 - remove books from library?
 - mark section as complete
+
+- report questions
+- user balance for generating questions?

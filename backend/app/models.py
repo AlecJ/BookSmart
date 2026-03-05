@@ -94,7 +94,7 @@ class BookWithChapters(SQLModel):
 
 
 class ChapterQuestionBase(SQLModel):
-    question_text: str = Field(unique=True, index=True)
+    question_text: str = Field(unique=True, index=True, min_length=1)
 
 
 class ChapterQuestionCreate(ChapterQuestionBase):

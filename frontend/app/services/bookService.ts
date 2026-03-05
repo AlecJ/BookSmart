@@ -32,7 +32,9 @@ export const bookService = {
 	},
 
 	getOrGenerateChapterQuestions: async (chapterId: string) => {
-		const { data } = await api.get(`/read/chapter/${chapterId}/questions`);
+		const { data } = await api.get(`/read/chapter/${chapterId}/questions`, {
+			timeout: 30000,
+		});
 		return data;
 	},
 
@@ -45,7 +47,7 @@ export const bookService = {
 		const payload = { response_text: userResponse };
 		const { data } = await api.post(
 			`/read/question/${questionId}`,
-			payload
+			payload,
 		);
 		return data;
 	},

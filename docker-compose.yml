@@ -53,6 +53,7 @@ services:
                       - .venv
                 - path: ./backend/pyproject.toml
                   action: rebuild
+        restart: always
 
 volumes:
     app-db-data:

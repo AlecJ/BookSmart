@@ -4,6 +4,7 @@ from sqlmodel import Session, select
 
 from app.models import Settings, UserResponse, UserResponseFeedback
 from app import crud
+from app.utils import logger
 
 
 client = OpenAI()
@@ -38,6 +39,8 @@ async def generate_chapter_question(*, session: Session, chapter_id: uuid.UUID) 
         session=session, chapter_id=chapter_id)
 
     if not chapter:
+        logger.error(f"Chapter not found", extra={
+                     "chapter_id": str(chapter_id)})
         raise ValueError("Chapter not found.")
 
     book_title = chapter.book.title
@@ -47,7 +50,7 @@ async def generate_chapter_question(*, session: Session, chapter_id: uuid.UUID) 
     # Fetch prompt and construct final input text
     prompt_template = fetch_prompt_template(
         session=session, key="openai_question_template")
-    book_details = f"Book Title: {book_title}\nAuthor: {book_author}\nChapter: {chapter_title}\n"
+    book_details = f"\nBook Title: {book_title}\nAuthor: {book_author}\nChapter: {chapter_title}"
     input_text = prompt_template + book_details
 
     response = await generate_response(session=session, input_text=input_text)

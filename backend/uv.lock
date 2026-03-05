@@ -61,6 +61,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pyjwt" },
+    { name = "sentry-sdk" },
     { name = "sqlmodel" },
 ]
 
@@ -75,6 +76,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.10.4" },
     { name = "pydantic-settings", specifier = ">=2.7.0" },
     { name = "pyjwt", specifier = ">=2.10.1" },
+    { name = "sentry-sdk", specifier = ">=2.48.0" },
     { name = "sqlmodel", specifier = ">=0.0.22" },
 ]
 

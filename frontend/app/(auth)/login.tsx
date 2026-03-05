@@ -77,7 +77,7 @@ export default function LoginScreen() {
 				<Link href="/(auth)/register" asChild>
 					<TouchableOpacity>
 						<Text style={styles.linkText}>
-							Don't have an account? Register here
+							Don&apos;t have an account? Register here
 						</Text>
 					</TouchableOpacity>
 				</Link>

@@ -48,9 +48,14 @@ export default function BookDetailsScreen() {
 	}, [chapter, chapterId, getOrGenerateChapterQuestions]);
 
 	// Show loading indicator while book is being fetched
-	if (!book || !chapter || !chapter.questions) {
+	if (
+		!book ||
+		!chapter ||
+		!chapter.questions ||
+		chapter.questions.length === 0
+	) {
 		return (
-			<View style={[styles.container, styles.loadingContainer]}>
+			<View style={[styles.container, styles.activityIndicator]}>
 				<ActivityIndicator size="large" color="#0e162d" />
 			</View>
 		);
@@ -135,5 +140,9 @@ const styles = StyleSheet.create({
 		width: "90%",
 		maxWidth: 600,
 		minHeight: 70,
+	},
+	activityIndicator: {
+		marginTop: "15%",
+		transform: [{ scale: 1.4 }],
 	},
 });

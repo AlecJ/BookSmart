@@ -6,6 +6,7 @@ from sqlmodel import select
 
 from app.api.deps import SessionDep, CurrentUser
 from app import crud
+from app.utils import logger
 from app.services.openai_service import generate_chapter_question, evaluate_user_response
 from app.api.helpers import add_computed_status_to_chapter_questions
 from app.models import (User, Book, UserBookLink, BookWithChapters, BookChapter,
@@ -138,6 +139,11 @@ async def get_or_generate_chapter_questions(*, session: SessionDep, current_user
 
     # Otherwise, generate questions using OpenAI service
     questions = await generate_chapter_question(session=session, chapter_id=chapter_id)
+
+    logger.info(
+        f"Generated questions for chapter",
+        extra={"chapter_id": str(chapter_id), "openai_response": questions})
+
     # split questions and create ChapterQuestion entries for each
     for question in questions.split('\n'):
         question_in = ChapterQuestionCreate(
