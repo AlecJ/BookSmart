@@ -44,3 +44,5 @@ See individual README in frontend/ and backend/ for info on running each.
 
 - report questions
 - user balance for generating questions?
+
+- publish on app store
