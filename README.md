@@ -13,6 +13,10 @@ See individual README in frontend/ and backend/ for info on running each.
 
 ## ToDo
 
+
+
+- questions can take too long to load (usually associated with a bad question)
+- submitting for feedback times out
 - after receiving feedback, go back to the question list: grade is not updated
 
 - how is a question with no text getting into the db

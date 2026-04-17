@@ -33,7 +33,9 @@ export default function Book({
 		<>
 			<View style={[styles.imageContainer]}>
 				<Image
-					source={book.imgSrc || book.image_url || placeholderImage}
+					source={
+						book.image_url || book.image_url || placeholderImage
+					}
 					style={[
 						style,
 						styles.book,
@@ -49,7 +51,7 @@ export default function Book({
 					priority="high"
 					onError={() =>
 						console.warn(
-							`Failed to load image for book: ${book.title}`
+							`Failed to load image for book: ${book.title}`,
 						)
 					}
 				/>

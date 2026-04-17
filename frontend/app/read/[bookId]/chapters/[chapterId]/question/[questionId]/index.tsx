@@ -49,7 +49,7 @@ export default function BookDetailsScreen() {
 		submitUserResponse,
 	} = useBooksCtx();
 
-	const feedbackGrade = feedback?.feedback_grade || null;
+	const feedbackGrade = feedback?.feedback_grade;
 
 	useEffect(() => {
 		if (!chapter && chapterId) {
@@ -87,7 +87,6 @@ export default function BookDetailsScreen() {
 
 		submitUserResponse(userResponse);
 		setShowFeedback(true);
-		// setSelectedQuestion(updatedQuestion);
 	};
 
 	// Show loading indicator while book is being fetched

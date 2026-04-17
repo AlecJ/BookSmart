@@ -71,7 +71,7 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 
 			// Preload book cover images into cache BEFORE setting state
 			const imageUrls = userBooks
-				.map((book) => book.image_url)
+				.map((book: BookType) => book.image_url)
 				.filter(Boolean);
 			if (imageUrls.length > 0) {
 				await preloadImages(imageUrls);
@@ -111,7 +111,7 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 
 			// Preload search result images into cache BEFORE setting state
 			const imageUrls = results
-				.map((book) => book.image_url)
+				.map((book: BookType) => book.image_url)
 				.filter(Boolean);
 			if (imageUrls.length > 0) {
 				await preloadImages(imageUrls);
@@ -179,7 +179,7 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 				);
 			}
 		},
-		[isAuthenticated],
+		[],
 	);
 
 	const getChapterQuestion = (questionId: string) => {
@@ -190,37 +190,61 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 		);
 	};
 
-	const getUserResponse = useCallback(
-		async (questionId: string) => {
-			try {
-				setIsLoadingBookData(true);
-				const userResponse =
-					await bookService.getUserResponse(questionId);
-				setUserResponse(userResponse?.response_text || "");
-				setFeedback(userResponse);
-			} catch (error: any) {
-				setUserResponse("");
-				setFeedback(undefined);
-			} finally {
-				setIsLoadingBookData(false);
-			}
-		},
-		[isAuthenticated, selectedQuestion],
-	);
+	const getUserResponse = useCallback(async (questionId: string) => {
+		try {
+			setIsLoadingBookData(true);
+			// NOT RETURNING feedback_grade
+			const userResponse = await bookService.getUserResponse(questionId);
+			setUserResponse(userResponse?.response_text || "");
+			setFeedback(userResponse);
+		} catch (error: any) {
+			setUserResponse("");
+			setFeedback(undefined);
+		} finally {
+			setIsLoadingBookData(false);
+		}
+	}, []);
 
 	const submitUserResponse = useCallback(
 		async (userResponse: string) => {
+			setFeedback(undefined);
+
 			try {
 				const newUserResponse = await bookService.submitUserResponse(
 					selectedQuestion?.id,
 					userResponse,
 				);
 				setFeedback(newUserResponse);
+
+				// Update the question status based on feedback grade
+				const newStatus = newUserResponse.feedback_grade;
+
+				// Update the selected question
+				// if (selectedQuestion) {
+				// 	setSelectedQuestion({
+				// 		...selectedQuestion,
+				// 		status: newStatus,
+				// 	});
+				// }
+
+				// Update the question in the chapter's questions array
+				if (selectedChapter && selectedQuestion) {
+					const updatedQuestions = selectedChapter.questions?.map(
+						(q) =>
+							q.id === selectedQuestion.id
+								? { ...q, status: newStatus }
+								: q,
+					);
+					setSelectedChapter({
+						...selectedChapter,
+						questions: updatedQuestions,
+					});
+				}
 			} catch (error: any) {
 				return;
 			}
 		},
-		[isAuthenticated, selectedQuestion],
+		[isAuthenticated, selectedQuestion, selectedChapter],
 	);
 
 	return (

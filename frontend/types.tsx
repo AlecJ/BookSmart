@@ -12,7 +12,7 @@ export interface BookType {
 	title: string;
 	author: string;
 	description: string;
-	imgSrc?: ImageSourcePropType;
+	image_url?: ImageSourcePropType;
 	chapters?: BookChapterType[];
 }
 
