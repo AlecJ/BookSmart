@@ -13,16 +13,17 @@ See individual README in frontend/ and backend/ for info on running each.
 
 ## ToDo
 
-
-
+- find way to poll or prompt user to reload question generation
 - questions can take too long to load (usually associated with a bad question)
+
 - submitting for feedback times out
-- after receiving feedback, go back to the question list: grade is not updated
 
 - how is a question with no text getting into the db
 - how do I handle the error gracefully
 - the call takes a number of questions and if fewer than two questions exist, get up to 3 questions
 - retry immediately?
+
+- Dune: chapters are in spanish
 
 - error when question text is blank (handle gracefully)
 - login error text if backend is down

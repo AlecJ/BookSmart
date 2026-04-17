@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import sentry_sdk
+from sentry_sdk.integrations.fastapi import FastApiIntegration
+from sentry_sdk.integrations.logging import LoggingIntegration
+import logging
 
 from app.api.main import api_router
 from app.core.config import settings
@@ -12,8 +15,16 @@ if settings.SENTRY_DSN:
     sentry_sdk.init(
         dsn=settings.SENTRY_DSN,
         send_default_pii=True,
-        traces_sample_rate=0.1,
+        # Higher sample rate in development to see more traces
+        traces_sample_rate=1.0 if settings.ENVIRONMENT == "development" else 0.1,
         environment=settings.ENVIRONMENT,
+        integrations=[
+            FastApiIntegration(transaction_style="endpoint"),
+            LoggingIntegration(
+                level=logging.INFO,
+                event_level=logging.ERROR
+            ),
+        ],
     )
 
 app = FastAPI(

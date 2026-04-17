@@ -1,9 +1,11 @@
 import uuid
+import sentry_sdk
 from openai import OpenAI
 from sqlmodel import Session, select
 
 from app.models import Settings, UserResponse, UserResponseFeedback
 from app import crud
+from app.core.config import settings
 from app.utils import logger
 
 
@@ -24,12 +26,36 @@ def fetch_prompt_template(*, session: Session, key: str) -> str:
 
 
 async def generate_response(*, session: Session, input_text: str) -> str:
+    with sentry_sdk.start_span(op="ai.request", name="OpenAI Call") as span:
+        span.set_data("ai.request.model", model)
+        span.set_data("ai.request.input_text", input_text)
 
-    response = client.responses.create(
-        model=model,
-        input=input_text
-    )
-    return response.output_text
+        try:
+            response = client.responses.create(
+                model=model,
+                input=input_text
+            )
+
+            response_text = response.output_text
+
+            if settings.ENVIRONMENT == "development":
+                span.set_data("ai.request.response_text", response_text)
+            else:
+                span.set_data("ai.request.response_text", response_text[:100])
+
+            return response_text
+
+        except Exception as e:
+            logger.error(
+                f"OpenAI API call failed: {str(e)}",
+                extra={
+                    "ai.request.model": model,
+                    "ai.request.input_text": input_text,
+                    "ai.request.error": str(e)
+                },
+                exc_info=True
+            )
+            raise
 
 
 # TODO prompt is hard coded to generate 3 questions for now
@@ -53,7 +79,23 @@ async def generate_chapter_question(*, session: Session, chapter_id: uuid.UUID) 
     book_details = f"\nBook Title: {book_title}\nAuthor: {book_author}\nChapter: {chapter_title}"
     input_text = prompt_template + book_details
 
+    logger.info(
+        "Generating chapter questions",
+        extra={
+            "book_title": book_title,
+            "book_author": book_author,
+            "chapter_title": chapter_title
+        }
+    )
+
     response = await generate_response(session=session, input_text=input_text)
+
+    if settings.ENVIRONMENT == "development":
+        logger.info(
+            "OpenAI response",
+            extra={"response": response}
+        )
+
     return response
 
 

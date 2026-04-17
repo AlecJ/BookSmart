@@ -219,14 +219,6 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 				// Update the question status based on feedback grade
 				const newStatus = newUserResponse.feedback_grade;
 
-				// Update the selected question
-				// if (selectedQuestion) {
-				// 	setSelectedQuestion({
-				// 		...selectedQuestion,
-				// 		status: newStatus,
-				// 	});
-				// }
-
 				// Update the question in the chapter's questions array
 				if (selectedChapter && selectedQuestion) {
 					const updatedQuestions = selectedChapter.questions?.map(
