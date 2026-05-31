@@ -76,7 +76,7 @@ async def generate_chapter_question(*, session: Session, chapter_id: uuid.UUID) 
     # Fetch prompt and construct final input text
     prompt_template = fetch_prompt_template(
         session=session, key="openai_question_template")
-    book_details = f"\nBook Title: {book_title}\nAuthor: {book_author}\nChapter: {chapter_title}"
+    book_details = f"\nBook Title: {book_title}\nAuthor: {book_author}\nChapter: {chapter_title}\n"
     input_text = prompt_template + book_details
 
     logger.info(

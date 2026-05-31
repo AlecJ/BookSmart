@@ -18,7 +18,7 @@ See individual README in frontend/ and backend/ for info on running each.
 
 - submitting for feedback times out
 
-- EX (Dune) - chapters are in spanish
+- EX (Dune) - chapters are in spanish? B1hSG45JCX4C
 
 - how is a question with no text getting into the db
 - how do I handle the error gracefully

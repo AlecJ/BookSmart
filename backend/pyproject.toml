@@ -17,3 +17,9 @@ dependencies = [
     "bcrypt>=5.0.0",
     "sentry-sdk>=2.48.0",
 ]
+
+[project.scripts]
+seed = "app.scripts.seed:main"
+
+[tool.uv]
+package = true

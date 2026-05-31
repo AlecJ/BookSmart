@@ -38,6 +38,9 @@
   or with docker
   `docker compose exec backend alembic upgrade head`
 
+- Seed the db
+  `docker compose exec backend seed`
+
 - Clear local database
   `docker compose down -v  # Removes volumes`
 
