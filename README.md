@@ -13,12 +13,12 @@ See individual README in frontend/ and backend/ for info on running each.
 
 ## ToDo
 
+- EX (Dune) - chapters are in spanish? B1hSG45JCX4C
+
 - find way to poll or prompt user to reload question generation
 - questions can take too long to load (usually associated with a bad question)
 
 - submitting for feedback times out
-
-- EX (Dune) - chapters are in spanish? B1hSG45JCX4C
 
 - how is a question with no text getting into the db
 - how do I handle the error gracefully
