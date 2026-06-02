@@ -51,7 +51,10 @@ function RootLayoutNav() {
 				<Header />
 				<ScrollView
 					style={styles.scrollContainer}
-					contentContainerStyle={{ alignItems: "center" }}
+					contentContainerStyle={{
+						alignItems: "center",
+						// flexGrow: 1,
+					}}
 				>
 					<View style={styles.content}>
 						<Stack screenOptions={{ headerShown: false }}>
@@ -96,5 +99,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		maxWidth: 970,
 		width: "100%",
+		// backgroundColor: "#f1e9d2",
 	},
 });

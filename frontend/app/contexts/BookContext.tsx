@@ -4,6 +4,7 @@ import {
 	BookType,
 	UserResponseType,
 } from "@/types";
+import { router } from "expo-router";
 import React, { createContext, useCallback, useEffect, useState } from "react";
 import { bookService } from "../services/bookService";
 import { preloadImages } from "../utils/imageCache";
@@ -95,10 +96,7 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 				setSelectedBook(bookData);
 			} catch (error: any) {
 				console.error("Failed to retrieve book data:", error);
-				throw new Error(
-					error.response?.data?.detail ||
-						"Failed to retrieve book data.",
-				);
+				router.replace("/+not-found");
 			}
 		},
 		[isAuthenticated],

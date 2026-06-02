@@ -14,6 +14,7 @@ from app.core.middleware import log_requests
 if settings.SENTRY_DSN:
     sentry_sdk.init(
         dsn=settings.SENTRY_DSN,
+        # enable_logs=True,
         send_default_pii=True,
         # Higher sample rate in development to see more traces
         traces_sample_rate=1.0 if settings.ENVIRONMENT == "development" else 0.1,

@@ -13,6 +13,10 @@ See individual README in frontend/ and backend/ for info on running each.
 
 ## ToDo
 
+- fix flexGrow
+- update not-found screen
+- fix question list page, book title redirect
+
 - EX (Dune) - chapters are in spanish? B1hSG45JCX4C
 
 - find way to poll or prompt user to reload question generation
