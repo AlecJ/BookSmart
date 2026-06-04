@@ -164,18 +164,24 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 	};
 
 	const getOrGenerateChapterQuestions = useCallback(
-		async (chapterId: string) => {
-			try {
-				const chapter =
-					await bookService.getOrGenerateChapterQuestions(chapterId);
-				setSelectedChapter(chapter);
-			} catch (error: any) {
-				console.error("Failed to retrieve chapter questions:", error);
-				throw new Error(
-					error.response?.data?.detail ||
-						"Failed to retrieve chapter questions.",
-				);
+		async (chapterId: string, retries = 3) => {
+			for (let attempt = 0; attempt < retries; attempt++) {
+				try {
+					const chapter =
+						await bookService.getOrGenerateChapterQuestions(
+							chapterId,
+						);
+					setSelectedChapter(chapter);
+					return;
+				} catch (error: any) {
+					console.error(
+						"Failed to retrieve chapter questions:",
+						error,
+					);
+					await new Promise((res) => setTimeout(res, 2500));
+				}
 			}
+			router.replace("/+not-found");
 		},
 		[],
 	);
@@ -204,6 +210,8 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 	}, []);
 
 	const submitUserResponse = useCallback(
+		// TODO turn into submitOrGet
+		// add retry logic
 		async (userResponse: string) => {
 			setFeedback(undefined);
 

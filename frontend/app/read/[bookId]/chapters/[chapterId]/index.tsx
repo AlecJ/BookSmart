@@ -12,7 +12,7 @@ import {
 } from "react-native";
 
 export default function BookDetailsScreen() {
-	const { chapterId } = useLocalSearchParams();
+	const { bookId, chapterId } = useLocalSearchParams();
 	const {
 		selectedBook: book,
 		selectedChapter: chapter,
@@ -80,7 +80,7 @@ export default function BookDetailsScreen() {
 
 	const content = (
 		<>
-			<Link href={`/read/${book.title}`}>
+			<Link href={`/read/${bookId}`}>
 				<Text style={[styles.text, styles.bookTitle]}>
 					{book.title}
 				</Text>

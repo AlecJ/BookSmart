@@ -251,8 +251,14 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: "#f1e9d2",
 		minHeight: 400,
+	},
+	loadingContainer: {
 		overflow: "hidden",
 		marginHorizontal: -20,
+		height: "100%",
+		width: "100%",
+		justifyContent: "center",
+		alignItems: "center",
 	},
 	questionText: {
 		color: "#0e162d",
