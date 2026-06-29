@@ -21,5 +21,14 @@ dependencies = [
 [project.scripts]
 seed = "app.scripts.seed:main"
 
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[dependency-groups]
+dev = ["pytest>=8.0", "anyio[trio]>=4.0"]
+
 [tool.uv]
 package = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,3 +1,4 @@
+import uuid
 from collections.abc import Generator
 from typing import Annotated
 
@@ -32,8 +33,8 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
-        user_id = payload.get('sub')
-    except (InvalidTokenError, ValidationError) as e:
+        user_id = uuid.UUID(payload.get('sub'))
+    except (InvalidTokenError, ValidationError, ValueError) as e:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
