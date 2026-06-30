@@ -3,8 +3,7 @@ from unittest.mock import AsyncMock, patch
 
 from fastapi.testclient import TestClient
 
-from app import crud
-from app.models import Book, BookChapterCreate
+from app.models import Book
 
 
 def test_add_book(client: TestClient):

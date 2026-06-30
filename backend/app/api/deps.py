@@ -34,7 +34,7 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
             token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
         user_id = uuid.UUID(payload.get('sub'))
-    except (InvalidTokenError, ValidationError, ValueError) as e:
+    except (InvalidTokenError, ValidationError, ValueError, TypeError) as e:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
