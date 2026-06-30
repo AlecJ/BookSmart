@@ -1,12 +1,30 @@
 [
 	{
+		"google_book_id": "Nlf8EAAAQBAJ",
 		"title": "Katabasis",
 		"author": "R. F. Kuang",
-		"description": "A journey to the underworld."
+		"description": "A journey to the underworld.",
+		"image_url": "https://books.google.com/books/publisher/content?id=Nlf8EAAAQBAJ&printsec=frontcover&img=1&zoom=4&imgtk=AFLRE714keSwJEONnyU4hk4ryymVkfggeh4SX6EQXYb4MBzzl0kiRRkeon6_91oRBpK92Njq8nRpuvOwkCnOPZidaOUqIKdwSr-JEar1Cs3wXepdX88d843d7k4RKY2vUrxcnXgMuraP&source=gbs_api"
 	},
 	{
+		"google_book_id": "NDsuXJjZ9aYC",
 		"title": "The Castle",
 		"author": "Franz Kafka",
-		"description": "A surreal exploration of bureaucracy and alienation."
+		"description": "A surreal exploration of bureaucracy and alienation.",
+		"image_url": "https://books.google.com/books/publisher/content?id=ScdAEQAAQBAJ&printsec=frontcover&img=1&zoom=4&imgtk=AFLRE738qELyQlbFDlF3HgyzuXaHjkM2FSNVNAfsEDzGDKiZMBWL34TQLehMuOY1QhQ8KfEIr84DIagjKY6XcosCkATUIRRrISq4t-RCFLsobgA7XdauYtKQu0bFJsGuZR08moZagBCZ&source=gbs_api"
+	},
+	{
+		"google_book_id": "d8lp4Wth67IC",
+		"title": "Second Foundation",
+		"author": "Isaac Asimov",
+		"description": "The final book in the original Foundation trilogy, exploring the concept of psychohistory and the fate of the Galactic Empire.",
+		"image_url": "https://books.google.com/books/content?id=d8lp4Wth67IC&printsec=frontcover&img=1&zoom=4&imgtk=AFLRE73Vq1FjW9aSBolsUYKauPDFrdL1YJKC1YRDk86y26G9eHGz5FwLYJ-fl18UzIgtWl_Gaqm3ZucyDJnw_uBQabG4GyZfq56HxiKCwAxC4BWgxXNqGiMg9zyovkJDZGkExiqCPTVR&source=gbs_api"
+	},
+	{
+		"google_book_id": "1v0mEAAAQBAJ",
+		"title": "The Catcher in the Rye",
+		"author": "J.D. Salinger",
+		"description": "A classic novel about teenage rebellion and alienation.",
+		"image_url": "https://books.google.com/books/publisher/content?id=ScdAEQAAQBAJ&printsec=frontcover&img=1&zoom=4&imgtk=AFLRE738qELyQlbFDlF3HgyzuXaHjkM2FSNVNAfsEDzGDKiZMBWL34TQLehMuOY1QhQ8KfEIr84DIagjKY6XcosCkATUIRRrISq4t-RCFLsobgA7XdauYtKQu0bFJsGuZR08moZagBCZ&source=gbs_api"
 	}
 ]

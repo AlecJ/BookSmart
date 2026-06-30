@@ -19,7 +19,8 @@ dependencies = [
 ]
 
 [project.scripts]
-seed = "app.scripts.seed:main"
+seed_settings = "app.scripts.seed:seed_settings_db"
+seed_books = "app.scripts.seed:seed_books_db"
 
 [tool.setuptools.packages.find]
 include = ["app*"]

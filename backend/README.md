@@ -39,7 +39,8 @@
   `docker compose exec backend alembic upgrade head`
 
 - Seed the db
-  `docker compose exec backend seed`
+  `docker compose exec backend seed_settings`
+  `docker compose exec backend seed_books`
 
 - Clear local database
   `docker compose down -v  # Removes volumes`

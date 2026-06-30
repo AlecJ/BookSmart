@@ -13,6 +13,12 @@ See individual README in frontend/ and backend/ for info on running each.
 
 ## Future Work
 
+- add to library button
+
+- shorten book descriptions
+
+- sizing on front page books
+
 - timeout on question submit
 - hide feedback until new feedback is in
 - update grade on chapter view
@@ -20,11 +26,6 @@ See individual README in frontend/ and backend/ for info on running each.
 
 - polish frontends
 - test very big resolution
-
-- seed script
-- deploy
-- tests
-- add tests to deploy process
 
 - do not allow adding a book already in library
 - remove books from library?
@@ -37,6 +38,7 @@ See individual README in frontend/ and backend/ for info on running each.
 
 Possible Issues:
 
+- seeded catcher in the rye, selected from search list, "cannot find audible book"
 - submitting for feedback times out
 - EX (Dune) - chapters are in spanish? B1hSG45JCX4C
 - login error text if backend is down
