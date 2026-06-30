@@ -13,15 +13,15 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v3
 
-            - name: Set up Python
-              uses: actions/setup-python@v4
+            - name: Install uv
+              uses: astral-sh/setup-uv@v5
               with:
-                  python-version: "3.x" # Specify the Python version you need
+                  version: "latest"
 
             - name: Install dependencies
-              run: |
-                  pip install pytest  # Add any other dependencies as needed
+              working-directory: backend
+              run: uv sync --group dev
 
             - name: Run Pytest
-              run: |
-                  pytest  # You can add flags like -v for verbose output
+              working-directory: backend
+              run: uv run pytest -v
