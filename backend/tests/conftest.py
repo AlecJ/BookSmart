@@ -9,17 +9,6 @@ from sqlalchemy import event
 from fastapi.testclient import TestClient
 import pytest
 from datetime import timedelta
-import os
-
-# Must be set before importing app modules so pydantic-settings picks them up.
-# These are dummy values; all routes are wired to the in-memory SQLite engine.
-os.environ.setdefault("POSTGRES_SERVER", "localhost")
-os.environ.setdefault("POSTGRES_USER", "testuser")
-os.environ.setdefault("POSTGRES_PASSWORD", "testpassword")
-os.environ.setdefault("POSTGRES_DB", "testdb")
-os.environ.setdefault("PROJECT_NAME", "BookSmart Test")
-os.environ.setdefault("SECRET_KEY", "test-secret-key-not-for-production-only")
-os.environ.setdefault("OPENAI_API_KEY", "test-openai-key")
 
 
 @pytest.fixture(name="engine")
