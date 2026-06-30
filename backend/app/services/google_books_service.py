@@ -7,7 +7,6 @@ from fastapi import HTTPException
 from app.api.deps import SessionDep
 from app import crud
 from app.models import Book
-from app.services.audible_service import get_book_chapters_from_audible
 
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
@@ -75,21 +74,7 @@ async def fetch_and_create_book(*, session: SessionDep, google_book_id: str) -> 
             return book
 
         # otherwise create a new book
-        db_book = crud.create_book(session=session, book_in=book_in)
-
-        # TODO move to other task location
-        # fetch chapters from Audible API
-        chapters = await get_book_chapters_from_audible(title=db_book.title, author=db_book.author)
-
-        # add chapters to db_book and db
-        for chapter_title in chapters:
-            chapter_in = {"title": chapter_title}
-            crud.create_book_chapter(
-                session=session, book_id=db_book.id, chapter_in=chapter_in)
-
-        session.refresh(db_book)
-
-        return db_book
+        return crud.create_book(session=session, book_in=book_in)
 
 
 def strip_html_tags(text: str) -> str:

@@ -7,10 +7,11 @@ from sqlmodel import select
 from app.api.deps import SessionDep, CurrentUser
 from app import crud
 from app.utils import logger
+from app.services.audible_service import get_book_chapters_from_audible
 from app.services.openai_service import generate_chapter_question, evaluate_user_response
 from app.api.helpers import add_computed_status_to_chapter_questions
 from app.models import (User, Book, UserBookLink, BookWithChapters, BookChapter,
-                        ChapterQuestion, BookChapterPublic, ChapterQuestionCreate, ChapterQuestionPublic, UserResponseCreate)
+                        ChapterQuestion, BookChapterPublic, BookChapterCreate, ChapterQuestionCreate, ChapterQuestionPublic, UserResponseCreate)
 
 router = APIRouter(prefix="/read", tags=["read"])
 
@@ -41,7 +42,7 @@ def get_books_for_user(*, session: SessionDep, current_user: CurrentUser) -> lis
 @router.get(
     "/book/{book_id}"
 )
-def get_book_details_for_user(*, session: SessionDep, current_user: CurrentUser, book_id: uuid.UUID) -> BookWithChapters:
+async def get_book_details_for_user(*, session: SessionDep, current_user: CurrentUser, book_id: uuid.UUID) -> BookWithChapters:
     """
     Return book details and user related data for a specific book in the user's library.
     """
@@ -69,6 +70,13 @@ def get_book_details_for_user(*, session: SessionDep, current_user: CurrentUser,
 
     if not user_book:
         raise HTTPException(status_code=404, detail="Book not found")
+
+    # Generate chapters if none exist (e.g. seeded book)
+    if not user_book.chapters:
+        chapter_titles = await get_book_chapters_from_audible(title=user_book.title, author=user_book.author)
+        for chapter_title in chapter_titles:
+            crud.create_book_chapter(session=session, book_id=user_book.id, chapter_in=BookChapterCreate(title=chapter_title))
+        session.refresh(user_book)
 
     # Compute user's current status for all chapters
     chapters_with_status = []

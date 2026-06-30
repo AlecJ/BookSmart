@@ -83,7 +83,9 @@ export default function BookSearchDetailsPage() {
 					style={styles.addToLibraryBtn}
 					onPress={handleAddToLibrary}
 				>
-					<Text>Add to Library</Text>
+					<Text style={styles.addToLibraryBtnText}>
+						Add to Library
+					</Text>
 				</Pressable>
 			</View>
 		</View>
@@ -136,8 +138,14 @@ const styles = StyleSheet.create({
 		color: "white",
 		width: 200,
 		height: 50,
-		textAlign: "center",
+
 		justifyContent: "center",
 		borderRadius: 8,
+	},
+	addToLibraryBtnText: {
+		color: "white",
+		fontSize: 18,
+		fontWeight: 400,
+		textAlign: "center",
 	},
 });

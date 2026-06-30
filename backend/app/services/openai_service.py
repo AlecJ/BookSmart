@@ -10,7 +10,7 @@ from app.utils import logger
 
 
 client = OpenAI()
-model = "gpt-5-nano"
+model = settings.OPENAI_MODEL
 
 
 def fetch_prompt_template(*, session: Session, key: str) -> str:

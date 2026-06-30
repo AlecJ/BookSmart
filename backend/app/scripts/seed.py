@@ -1,7 +1,8 @@
 import json
-from sqlmodel import Session, select
+from sqlmodel import Session
 from app.core.db import engine
-from app.models import Settings, Book, BookChapter, ChapterQuestion
+from app.models import Settings, Book
+from app import crud
 
 
 # read seed file
@@ -38,18 +39,16 @@ def seed_books_db():
         result_count = 0
         
         for book in books_data:
-            existing_book = session.exec(select(Book).where(Book.google_book_id == book["google_book_id"])).first()
+            existing_book = crud.get_book_by_google_book_id(session=session, google_book_id=book["google_book_id"])
+            
             if not existing_book:
-                new_book = Book(
+                crud.create_book(session=session, book_in=Book(
                     title=book["title"],
                     author=book["author"],
                     description=book["description"],
                     image_url=book["image_url"],
                     google_book_id=book["google_book_id"]
-                )
-                session.add(new_book)
-                # session.commit()  # Commit to get the book ID
+                ))
                 result_count += 1
 
         print(f"Seeded {result_count} books.")
-        session.commit()
