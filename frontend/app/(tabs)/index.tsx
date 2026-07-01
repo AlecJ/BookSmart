@@ -10,31 +10,9 @@ export default function Index() {
 
 	const { books, getUserBooks } = useBooksCtx();
 
-	// useFocusEffect(
-	// 	useCallback(() => {
-	// 		getUserBooks();
-	// 	}, [getUserBooks])
-	// );
-
 	useEffect(() => {
 		getUserBooks();
 	}, [getUserBooks]);
-
-	// const books: BookType[] = [
-	// 	{
-	// 		name: "Letters_to_a_Young_Chef",
-	// 		imgSrc: require("@/assets/images/LettersToAYoungChef.jpg"),
-	// 		progress: 0.75,
-	// 	},
-	// 	{ name: "Book 2" },
-	// 	{ name: "Book 3" },
-	// 	{ name: "Book 4" },
-	// 	{ name: "Book 5" },
-	// 	{ name: "Book 9" },
-	// 	{ name: "Book 6" },
-	// 	{ name: "Book 7" },
-	// 	{ name: "Book 8" },
-	// ];
 
 	return (
 		<>
@@ -45,6 +23,9 @@ export default function Index() {
 					const content = (
 						<>
 							<View style={styles.container}>
+								<Text style={styles.continueText}>
+									Continue Reading...
+								</Text>
 								<Link asChild href={`/read/${books[0].id}`}>
 									<Book
 										style={styles.mainBook}
@@ -55,8 +36,11 @@ export default function Index() {
 								</Link>
 							</View>
 							<View style={styles.container}>
+								<Text style={styles.libraryText}>
+									Your Library
+								</Text>
 								<View style={styles.bookshelf}>
-									{books.slice(1).map((book, index) => (
+									{books.slice(1, 7).map((book, index) => (
 										<Link
 											key={index}
 											asChild
@@ -107,7 +91,7 @@ const styles = StyleSheet.create({
 		borderRadius: 15,
 	},
 	smallBook: {
-		width: "25%",
+		width: "33%",
 		aspectRatio: 2 / 3,
 		padding: 4,
 		borderRadius: 8,
@@ -119,9 +103,17 @@ const styles = StyleSheet.create({
 		alignContent: "center",
 		padding: 15,
 		width: "100%",
-		flex: 1,
 	},
 	text: {
 		color: "#0e162d",
+	},
+	continueText: {
+		fontSize: 20,
+		fontWeight: 500,
+	},
+	libraryText: {
+		fontSize: 20,
+		fontWeight: 500,
+		marginBottom: 10,
 	},
 });

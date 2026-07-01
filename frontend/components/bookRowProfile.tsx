@@ -11,9 +11,7 @@ export default function ProfileBookRow({ book }: Props) {
 }
 
 const styles = StyleSheet.create({
-	profileBookRow: {
-		marginBottom: 10,
-	},
+	profileBookRow: {},
 	rowContainer: {
 		height: 96,
 		width: 550,

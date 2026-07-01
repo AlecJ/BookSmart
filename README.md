@@ -13,8 +13,12 @@ See individual README in frontend/ and backend/ for info on running each.
 
 ## Future Work
 
-- shorten book descriptions
-- sizing on front page books
+- profile page scroll down to fetch 10 more, until end
+- terraform
+
+- update profile
+- avatar selection (premade)
+- update password
 
 - timeout on question submit
 - hide feedback until new feedback is in
@@ -31,6 +35,9 @@ See individual README in frontend/ and backend/ for info on running each.
 - report questions
 - user balance for generating questions?
 
+- password forget link
+- email for password reset
+
 - publish on app store
 
 Possible Issues:
@@ -41,3 +48,9 @@ Possible Issues:
 - submitting for feedback times out
 - EX (Dune) - chapters are in spanish? B1hSG45JCX4C
 - login error text if backend is down
+
+- chapter list page rework - next up section, see all button or dropdown
+- shorten book descriptions
+
+- better resolutions for front page (faster loading)
+- verify change order of books when you update them, last to have a submission update

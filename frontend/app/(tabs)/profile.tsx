@@ -1,46 +1,45 @@
 import ProfileBookRow from "@/components/bookRowProfile";
-import { BookType } from "@/types";
+import { Link } from "expo-router";
+import { useEffect } from "react";
 import {
-	FlatList,
-	Platform,
+	ActivityIndicator,
+	NativeScrollEvent,
+	NativeSyntheticEvent,
 	ScrollView,
 	StyleSheet,
 	Text,
 	TextInput,
 	View,
 } from "react-native";
-
-const books: BookType[] = [
-	{
-		name: "Letters_to_a_Young_Chef",
-		prettyName: "Letters to a Young Chef",
-		imgSrc: require("@/assets/images/LettersToAYoungChef.jpg"),
-		progress: 0.75,
-		author: "Daniel Boulud",
-	},
-	{ name: "Book 2" },
-	{ name: "Book 3" },
-	{ name: "Book 4" },
-	{ name: "Book 5" },
-	{ name: "Book 6" },
-	{ name: "Book 7" },
-	{ name: "Book 8" },
-	{ name: "Book 9" },
-	{ name: "Book 10" },
-	{ name: "Book 11" },
-	{ name: "Book 12" },
-];
+import { useBooksCtx } from "../contexts/BookContext";
 
 export default function ProfileScreen() {
-	const isWeb = Platform.OS === "web";
+	const { books, getUserBooks, loadMoreBooks, isLoadingMoreBooks } =
+		useBooksCtx();
 
-	return (() => {
-		const content = (
-			<>
+	useEffect(() => {
+		getUserBooks();
+	}, [getUserBooks]);
+
+	const handleScroll = ({
+		nativeEvent,
+	}: NativeSyntheticEvent<NativeScrollEvent>) => {
+		const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+		if (
+			layoutMeasurement.height + contentOffset.y >=
+			contentSize.height - 200
+		) {
+			loadMoreBooks();
+		}
+	};
+
+	return (
+		<ScrollView onScroll={handleScroll} scrollEventThrottle={400}>
+			<View style={styles.profilePage}>
 				<View style={styles.profileColumn}>
 					<View style={styles.profileContainer}>
 						<Text style={styles.columnHeader}>Your Profile</Text>
-						<View style={styles.profileImage}></View>
+						<View style={styles.profileImage} />
 						<View style={styles.userDetails}>
 							<View style={styles.userDetailsRow}>
 								<Text>Name:</Text>
@@ -50,38 +49,27 @@ export default function ProfileScreen() {
 								/>
 							</View>
 						</View>
-						<View></View>
 					</View>
 				</View>
 				<View style={styles.historyColumn}>
 					<Text style={styles.columnHeader}>Reading History</Text>
-					<FlatList
-						style={{ flex: 1, minHeight: 0 }}
-						data={books}
-						renderItem={({ item }) => (
+					{books.map((item, index) => (
+						<Link key={index} href={`/read/${item.id}`}>
 							<ProfileBookRow book={item} />
-						)}
-						keyExtractor={(item, index) => index.toString()}
-						showsVerticalScrollIndicator
-					/>
+						</Link>
+					))}
+					{isLoadingMoreBooks && (
+						<ActivityIndicator size="large" style={{ padding: 24 }} />
+					)}
 				</View>
-			</>
-		);
-
-		return isWeb ? (
-			<View style={styles.profilePage}>{content}</View>
-		) : (
-			<ScrollView>{content}</ScrollView>
-		);
-	})();
+			</View>
+		</ScrollView>
+	);
 }
 
 const styles = StyleSheet.create({
 	profilePage: {
-		flex: 1,
 		flexDirection: "row",
-		borderWidth: 2,
-		borderColor: "red",
 	},
 	columnHeader: {
 		fontSize: 20,
@@ -92,8 +80,6 @@ const styles = StyleSheet.create({
 	profileColumn: {
 		flex: 2,
 		maxHeight: 600,
-		borderWidth: 2,
-		borderColor: "blue",
 	},
 	profileContainer: {
 		flex: 1,
@@ -117,7 +103,7 @@ const styles = StyleSheet.create({
 	},
 	historyColumn: {
 		flex: 3,
-		alignSelf: "flex-end",
+		alignSelf: "flex-start",
 		maxWidth: 550,
 	},
 });

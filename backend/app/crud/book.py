@@ -13,6 +13,7 @@ CRUD operations for Book
 
 
 def create_book(*, session: Session, book_in: Book) -> Book:
+    print(book_in)
     db_book = Book.model_validate(book_in)
     session.add(db_book)
     session.commit()

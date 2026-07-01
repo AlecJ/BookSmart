@@ -24,7 +24,7 @@ These endpoints are for fetching a user's books and related data.
 @router.get(
     "/"
 )
-def get_books_for_user(*, session: SessionDep, current_user: CurrentUser) -> list[Book]:
+def get_books_for_user(*, session: SessionDep, current_user: CurrentUser, limit: int = 10, offset: int = 0) -> list[Book]:
     """
     Get all books in the user's library.
     """
@@ -34,9 +34,9 @@ def get_books_for_user(*, session: SessionDep, current_user: CurrentUser) -> lis
 
     user_links = user.books
     user_links.sort(key=lambda link: link.last_updated, reverse=True)
-    user_books = [link.book for link in user.books]
+    user_books = [link.book for link in user_links]
 
-    return user_books
+    return user_books[offset:offset + limit]
 
 
 @router.get(

@@ -2,8 +2,10 @@ import { BookType } from "@/types";
 import { api } from "./api";
 
 export const bookService = {
-	getBooks: async () => {
-		const { data } = await api.get("/read");
+	getBooks: async (limit: number, offset: number) => {
+		const { data } = await api.get("/read", {
+			params: { limit, offset },
+		});
 		return data;
 	},
 

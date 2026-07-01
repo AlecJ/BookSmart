@@ -22,6 +22,9 @@ interface BookContextType {
 	feedback: UserResponseType | undefined;
 	setFeedback: (feedback: UserResponseType | undefined) => void;
 	books: BookType[];
+	hasMoreBooks: boolean;
+	isLoadingMoreBooks: boolean;
+	loadMoreBooks: () => Promise<void>;
 	searchBookResults: BookType[];
 	getUserBooks: () => Promise<void>;
 	getUserBookData: (bookId: string) => Promise<void>;
@@ -54,6 +57,9 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 		undefined,
 	);
 	const [books, setBooks] = useState<BookType[]>([]);
+	const [booksOffset, setBooksOffset] = useState(0);
+	const [hasMoreBooks, setHasMoreBooks] = useState(true);
+	const [isLoadingMoreBooks, setIsLoadingMoreBooks] = useState(false);
 	const [searchBookResults, setSearchBooks] = useState<BookType[]>([]);
 	const [isSearching, setIsSeraching] = useState<boolean>(false);
 	const { isLoading, isAuthenticated } = useAuth();
@@ -65,28 +71,43 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 		}
 	}, [isLoading, isAuthenticated]);
 
-	const getUserBooks = useCallback(async () => {
-		if (!isAuthenticated) return;
-		try {
-			const userBooks = await bookService.getBooks();
+	const getUserBooks = useCallback(
+		async (limit = 10, offset = 0, append = false) => {
+			if (!isAuthenticated) return;
+			try {
+				if (append) setIsLoadingMoreBooks(true);
+				const userBooks = await bookService.getBooks(limit, offset);
 
-			// Preload book cover images into cache BEFORE setting state
-			const imageUrls = userBooks
-				.map((book: BookType) => book.image_url)
-				.filter(Boolean);
-			if (imageUrls.length > 0) {
-				await preloadImages(imageUrls);
+				// Preload book cover images into cache BEFORE setting state
+				const imageUrls = userBooks
+					.map((book: BookType) => book.image_url)
+					.filter(Boolean);
+				if (imageUrls.length > 0) {
+					await preloadImages(imageUrls);
+				}
+
+				setBooks((prev) =>
+					append ? [...prev, ...userBooks] : userBooks,
+				);
+				setBooksOffset(offset + userBooks.length);
+				setHasMoreBooks(userBooks.length === limit);
+			} catch (error: any) {
+				console.error("Failed to retrieve user books:", error);
+				throw new Error(
+					error.response?.data?.detail ||
+						"Failed to retrieve user books.",
+				);
+			} finally {
+				if (append) setIsLoadingMoreBooks(false);
 			}
+		},
+		[isAuthenticated],
+	);
 
-			setBooks(userBooks);
-		} catch (error: any) {
-			console.error("Failed to retrieve user books:", error);
-			throw new Error(
-				error.response?.data?.detail ||
-					"Failed to retrieve user books.",
-			);
-		}
-	}, [isAuthenticated]);
+	const loadMoreBooks = useCallback(async () => {
+		if (!hasMoreBooks || isLoadingMoreBooks) return;
+		await getUserBooks(10, booksOffset, true);
+	}, [hasMoreBooks, isLoadingMoreBooks, booksOffset, getUserBooks]);
 
 	const getUserBookData = useCallback(
 		async (bookId: string) => {
@@ -259,6 +280,9 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 				feedback,
 				setFeedback,
 				books,
+				hasMoreBooks,
+				isLoadingMoreBooks,
+				loadMoreBooks,
 				searchBookResults,
 				getUserBookData,
 				getUserBooks,
