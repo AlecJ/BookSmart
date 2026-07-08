@@ -6,6 +6,11 @@ variable "neon_api_key" {
   sensitive   = true
 }
 
+variable "neon_org_id" {
+  description = "Neon organization ID. Found at console.neon.tech → Organization → Settings (format: org-xxxx-xxxx)."
+  type        = string
+}
+
 # ─── Render ──────────────────────────────────────────────────────────────────
 
 variable "render_api_key" {

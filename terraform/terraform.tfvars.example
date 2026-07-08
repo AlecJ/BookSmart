@@ -4,6 +4,7 @@
 
 # ─── Neon ────────────────────────────────────────────────────────────────────
 neon_api_key = "your-neon-api-key"
+neon_org_id  = "org-xxxx-xxxx" # console.neon.tech → Organization → Settings
 
 # ─── Render ──────────────────────────────────────────────────────────────────
 render_api_key  = "rnd_xxxxxxxxxxxxxxxxxxxx"
