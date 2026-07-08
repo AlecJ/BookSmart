@@ -1,0 +1,22 @@
+# Terraform directory (downloaded providers and modules — not committed)
+.terraform/
+
+# State files (managed by Terraform Cloud — never commit locally)
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
+# Local variable files (contain secrets)
+# Use Terraform Cloud workspace variables in CI; terraform.tfvars for local runs only
+*.tfvars
+!*.tfvars.example
+
+# Override files (local machine customizations)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# .terraform.lock.hcl is intentionally committed — it pins provider versions
+# for reproducible runs across machines and CI.

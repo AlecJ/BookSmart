@@ -1,0 +1,58 @@
+name: Terraform Plan
+
+on:
+    pull_request:
+        branches:
+            - main
+
+permissions:
+    contents: read
+    pull-requests: write # Required to post the plan as a PR comment
+
+jobs:
+    plan:
+        name: Terraform Plan
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v3
+              with:
+                  cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+            - name: Terraform Init
+              working-directory: terraform
+              run: terraform init
+
+            - name: Terraform Plan
+              id: plan
+              working-directory: terraform
+              # "plan-run" is a placeholder for image_tag — the actual SHA is only known at deploy time.
+              # The plan still accurately shows all infrastructure changes for review.
+              run: terraform plan -no-color -var="image_tag=plan-run" 2>&1 | tee /tmp/plan_output.txt
+              continue-on-error: true
+
+            - name: Post plan as PR comment
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const fs = require('fs');
+                      const plan = fs.readFileSync('/tmp/plan_output.txt', 'utf8');
+                      const maxLength = 65000;
+                      const body = plan.length > maxLength
+                        ? plan.substring(0, maxLength) + '\n\n_...output truncated_'
+                        : plan;
+
+                      github.rest.issues.createComment({
+                        issue_number: context.issue.number,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        body: `#### Terraform Plan 📋\n<details><summary>Show plan output</summary>\n\n\`\`\`\n${body}\n\`\`\`\n</details>\n\n*Triggered by @${context.actor}*`
+                      });
+
+            - name: Fail if plan errored
+              if: steps.plan.outcome == 'failure'
+              run: exit 1
