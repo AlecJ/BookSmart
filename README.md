@@ -14,7 +14,6 @@ See individual README in frontend/ and backend/ for info on running each.
 ## Future Work
 
 - profile page scroll down to fetch 10 more, until end
-- terraform
 
 - update profile
 - avatar selection (premade)

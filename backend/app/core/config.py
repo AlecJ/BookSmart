@@ -42,9 +42,10 @@ class Settings(BaseSettings):
     @computed_field  # type: ignore[prop-decorator]
     @property
     def all_cors_origins(self) -> list[str]:
+        origins = [self.FRONTEND_HOST.rstrip("/")]
         if self.BACKEND_CORS_ORIGINS:
-            return [str(origin).rstrip("/") for origin in self.BACKEND_CORS_ORIGINS]
-        return []
+            origins += [str(o).rstrip("/") for o in self.BACKEND_CORS_ORIGINS]
+        return origins
 
     PROJECT_NAME: str
     SENTRY_DSN: HttpUrl | None = None

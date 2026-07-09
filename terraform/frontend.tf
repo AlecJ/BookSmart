@@ -1,8 +1,6 @@
 # Render auto-deploys this service when commits land on main.
 # Terraform manages the service configuration (env vars, build command, publish path).
-#
-# Prerequisite: Connect your GitHub account to Render once via the dashboard at
-# https://dashboard.render.com/select-repo — Render needs OAuth access to pull the repo.
+
 resource "render_static_site" "frontend" {
   name = "booksmart-frontend"
 

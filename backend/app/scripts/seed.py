@@ -1,16 +1,16 @@
 import json
+from pathlib import Path
 from sqlmodel import Session
 from app.core.db import engine
 from app.models import Settings, Book
 from app import crud
 
+SEEDS_DIR = Path(__file__).parent.parent.parent / "seeds"
+
 
 # read seed file
 def get_seed_data(seed_file_name: str) -> dict:
-    # Get the path to the seeds directory
-    seeds_dir = '/app/seeds/'
-
-    with open(seeds_dir + seed_file_name, 'r') as f:
+    with open(SEEDS_DIR / seed_file_name, 'r') as f:
         return json.load(f)
 
 
