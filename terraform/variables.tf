@@ -63,6 +63,12 @@ variable "openai_api_key" {
   sensitive   = true
 }
 
+variable "google_api_key" {
+  description = "Google API key."
+  type        = string
+  sensitive   = true
+}
+
 variable "openai_model" {
   description = "OpenAI model name."
   type        = string

@@ -20,5 +20,6 @@ ghcr_token = "ghp_xxxxxxxxxxxxxxxxxxxx" # GitHub PAT with read:packages scope
 secret_key     = "replace-with-output-of-openssl-rand-hex-32"
 openai_api_key = "sk-xxxxxxxxxxxxxxxxxxxx"
 openai_model   = "gpt-4o-mini"
+google_api_key = "AIzaSyxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 project_name   = "BookSmart"
 frontend_host  = "" # e.g. https://your-frontend.onrender.com

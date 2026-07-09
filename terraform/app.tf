@@ -45,5 +45,8 @@ resource "render_web_service" "backend" {
     # OpenAI
     OPENAI_API_KEY = { value = var.openai_api_key }
     OPENAI_MODEL   = { value = var.openai_model }
+
+    # Google
+    GOOGLE_API_KEY = { value = var.google_api_key }
   }
 }
