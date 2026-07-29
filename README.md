@@ -15,6 +15,10 @@ See individual README in frontend/ and backend/ for info on running each.
 
 - profile page scroll down to fetch 10 more, until end
 
+- do not allow adding a book already in library
+- remove books from library?
+- mark section as complete
+
 - update profile
 - avatar selection (premade)
 - update password
@@ -26,10 +30,6 @@ See individual README in frontend/ and backend/ for info on running each.
 
 - polish frontends
 - test very big resolution
-
-- do not allow adding a book already in library
-- remove books from library?
-- mark section as complete
 
 - report questions
 - user balance for generating questions?
