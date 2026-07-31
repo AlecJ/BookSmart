@@ -3,18 +3,38 @@ import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
 import {
 	ActivityIndicator,
+	NativeScrollEvent,
+	NativeSyntheticEvent,
 	Platform,
 	ScrollView,
 	StyleSheet,
 	View,
 } from "react-native";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import { BookProvider } from "./contexts/BookContext";
+import { BookProvider, useBooksCtx } from "./contexts/BookContext";
 
 function RootLayoutNav() {
 	const { isAuthenticated, isLoading } = useAuth();
+	const { loadMoreBooks } = useBooksCtx();
 	const segments = useSegments();
 	const router = useRouter();
+
+	// On web the profile screen's own ScrollView never overflows (it sits
+	// inside this outer ScrollView), so pagination has to be driven from here.
+	const isProfileRoute =
+		segments[0] === "(tabs)" && segments[1] === "profile";
+	const handleWebScroll = ({
+		nativeEvent,
+	}: NativeSyntheticEvent<NativeScrollEvent>) => {
+		if (!isProfileRoute) return;
+		const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+		if (
+			layoutMeasurement.height + contentOffset.y >=
+			contentSize.height - 200
+		) {
+			loadMoreBooks();
+		}
+	};
 
 	useEffect(() => {
 		if (isLoading) return;
@@ -55,6 +75,8 @@ function RootLayoutNav() {
 						alignItems: "center",
 						// flexGrow: 1,
 					}}
+					onScroll={handleWebScroll}
+					scrollEventThrottle={400}
 				>
 					<View style={styles.content}>
 						<Stack screenOptions={{ headerShown: false }}>

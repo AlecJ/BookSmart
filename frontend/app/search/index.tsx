@@ -3,12 +3,20 @@ import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { useBooksCtx } from "../contexts/BookContext";
 
 export default function SearchScreen() {
-	const { searchBookResults, isSearching } = useBooksCtx();
+	const { searchBookResults, isSearching, searchError } = useBooksCtx();
 
 	if (isSearching) {
 		return (
 			<View style={[styles.container, { flex: 1, marginTop: 50 }]}>
 				<ActivityIndicator size="large" color="#0e162d" />
+			</View>
+		);
+	}
+
+	if (searchError) {
+		return (
+			<View style={[styles.container, { flex: 1, marginTop: 50 }]}>
+				<Text style={styles.noResultsText}>{searchError}</Text>
 			</View>
 		);
 	}

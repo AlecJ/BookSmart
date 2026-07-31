@@ -17,18 +17,39 @@ export default function BookSearchDetailsPage() {
 	const [book, setBook] = useState<BookType | null>(null);
 	const isWeb = Platform.OS === "web";
 
-	const { selectedBook, viewSearchResultBook, addBookToLibrary } =
-		useBooksCtx();
+	const {
+		selectedBook,
+		viewSearchResultBook,
+		addBookToLibrary,
+		bookDetailsError,
+		books,
+	} = useBooksCtx();
+
+	const isInLibrary =
+		!!book &&
+		books.some(
+			(libraryBook) => libraryBook.google_book_id === book.google_book_id,
+		);
 
 	const handleAddToLibrary = async () => {
-		if (book) {
-			try {
-				await addBookToLibrary(book);
-				router.replace(`/read/${book.id}`);
-			} catch (error) {
-				console.error("Failed to add book to library:", error);
-				alert("Failed to add book to library. Please try again.");
+		if (!book) return;
+
+		if (isInLibrary) {
+			router.push(`/read/${book.id}`);
+			return;
+		}
+
+		try {
+			await addBookToLibrary(book);
+			router.replace(`/read/${book.id}`);
+		} catch (error: any) {
+			// Fall back gracefully if the library list hadn't loaded this book yet
+			if (error?.message?.toLowerCase().includes("already")) {
+				router.push(`/read/${book.id}`);
+				return;
 			}
+			console.error("Failed to add book to library:", error);
+			alert("Failed to add book to library. Please try again.");
 		}
 	};
 
@@ -44,6 +65,13 @@ export default function BookSearchDetailsPage() {
 
 	// Show loading indicator while book is being fetched
 	if (!book) {
+		if (bookDetailsError) {
+			return (
+				<View style={[styles.container, styles.loadingContainer]}>
+					<Text style={styles.text}>{bookDetailsError}</Text>
+				</View>
+			);
+		}
 		return (
 			<View style={[styles.container, styles.loadingContainer]}>
 				<ActivityIndicator size="large" color="#0e162d" />
@@ -84,7 +112,7 @@ export default function BookSearchDetailsPage() {
 					onPress={handleAddToLibrary}
 				>
 					<Text style={styles.addToLibraryBtnText}>
-						Add to Library
+						{isInLibrary ? "Open Book" : "Add to Library"}
 					</Text>
 				</Pressable>
 			</View>

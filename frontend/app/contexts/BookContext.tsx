@@ -33,7 +33,9 @@ interface BookContextType {
 	getChapterQuestion: (questionId: string) => BookQuestionType | undefined;
 	searchBooks: (query: string) => Promise<void>;
 	isSearching?: boolean;
+	searchError?: string;
 	viewSearchResultBook?: (bookId: string) => Promise<void>;
+	bookDetailsError?: string;
 	addBookToLibrary: (book: BookType) => Promise<void>;
 	getUserResponse: (questionId: string) => Promise<void>;
 	submitUserResponse: (response: string) => Promise<void>;
@@ -62,6 +64,12 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 	const [isLoadingMoreBooks, setIsLoadingMoreBooks] = useState(false);
 	const [searchBookResults, setSearchBooks] = useState<BookType[]>([]);
 	const [isSearching, setIsSeraching] = useState<boolean>(false);
+	const [searchError, setSearchError] = useState<string | undefined>(
+		undefined,
+	);
+	const [bookDetailsError, setBookDetailsError] = useState<
+		string | undefined
+	>(undefined);
 	const { isLoading, isAuthenticated } = useAuth();
 
 	useEffect(() => {
@@ -126,6 +134,7 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 	const searchBooks = useCallback(async (query: string) => {
 		try {
 			setIsSeraching(true);
+			setSearchError(undefined);
 			const results = await bookService.searchBooks(query);
 
 			// Preload search result images into cache BEFORE setting state
@@ -137,22 +146,25 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 			}
 
 			setSearchBooks(results);
-			setIsSeraching(false);
 		} catch (error: any) {
 			console.error("Book search failed:", error);
-			throw new Error(
+			setSearchBooks([]);
+			setSearchError(
 				error.response?.data?.detail || "Book search failed.",
 			);
+		} finally {
+			setIsSeraching(false);
 		}
 	}, []);
 
 	const viewSearchResultBook = useCallback(async (bookId: string) => {
 		try {
+			setBookDetailsError(undefined);
 			const book = await bookService.getOrCreateSearchBook(bookId);
 			setSelectedBook(book);
 		} catch (error: any) {
 			console.error("Failed to retrieve book details:", error);
-			throw new Error(
+			setBookDetailsError(
 				error.response?.data?.detail ||
 					"Failed to retrieve book details.",
 			);
@@ -291,7 +303,9 @@ export function BookProvider({ children }: { children: React.ReactElement }) {
 				getChapterQuestion,
 				searchBooks,
 				isSearching,
+				searchError,
 				viewSearchResultBook,
+				bookDetailsError,
 				addBookToLibrary,
 				getUserResponse,
 				submitUserResponse,
