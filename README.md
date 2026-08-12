@@ -34,8 +34,6 @@ See individual README in frontend/ and backend/ for info on running each.
 - password forget link
 - email for password reset
 
-- publish on app store
-
 Possible Issues:
 
 - seeded catcher in the rye, selected from search list, "cannot find audible book"
