@@ -33,7 +33,7 @@ def test_get_book_details_not_in_library(client: TestClient, test_user, test_boo
     assert response.status_code == 404
 
 
-def test_get_book_details_in_library(client: TestClient, session, test_user, test_book, auth_headers):
+def test_get_book_details_in_library(client: TestClient, session, test_user, test_book, test_chapter, auth_headers):
     crud.create_book_link(
         session=session, user_id=test_user.id, book_id=test_book.id)
     response = client.get(

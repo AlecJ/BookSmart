@@ -3,7 +3,7 @@ import sentry_sdk
 from openai import OpenAI
 from sqlmodel import Session, select
 
-from app.models import Settings, UserResponse, UserResponseFeedback
+from app.models import Settings, UserResponse
 from app import crud
 from app.core.config import settings
 from app.utils import logger
@@ -99,7 +99,7 @@ async def generate_chapter_question(*, session: Session, chapter_id: uuid.UUID) 
     return response
 
 
-async def evaluate_user_response(*, session: Session, user_response: UserResponse) -> UserResponseFeedback:
+async def evaluate_user_response(*, session: Session, user_response: UserResponse) -> tuple[str, int]:
     # Get book details
     question = crud.get_chapter_question_by_id(
         session=session, question_id=user_response.question_id)
@@ -127,4 +127,4 @@ async def evaluate_user_response(*, session: Session, user_response: UserRespons
     feedback_text = parts[0].replace("Feedback:", "").strip()
     feedback_grade = int(parts[1].strip())
 
-    return {feedback_text: feedback_text, feedback_grade: feedback_grade}
+    return feedback_text, feedback_grade

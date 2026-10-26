@@ -1,67 +1,36 @@
-# BookSmart
+# BookSmart frontend
 
-BookSmart is a companion app for readers that enhances comprehension with chapter-end quizzes and feedback via ChatGPT.
+BookSmart's frontend is a responsive React single-page application for web,
+built with Vite, TypeScript, and React Router. It uses the FastAPI backend
+through the `VITE_API_URL` build-time environment variable.
 
-Front End: Expo, React Native, TypeScript
-Back End: FastAPI, PostgreSQL
-
-## Future Work
-
--   placeholder book covers should be generated with title (and random color)
-
-...
-
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
-
-## Get started
-
-1. Install dependencies
-
-    ```bash
-    npm install
-    ```
-
-2. Start the app
-
-    ```bash
-    npx expo start
-    ```
-
-    or if there is an issue connecting with your mobile device:
-
-    ```bash
-    npx expo start --tunnel
-    ```
-
-In the output, you'll find options to open the app in a
-
--   [development build](https://docs.expo.dev/develop/development-builds/introduction/)
--   [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
--   [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
--   [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Local development
 
 ```bash
-npm run reset-project
+npm install
+npm run dev
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+The API defaults to `http://localhost:8000`. To use another backend, create a
+`.env.local` file with:
 
-## Learn more
+```text
+VITE_API_URL=https://your-api.example.com
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+## Production build
 
--   [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
--   [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npm run build
+npm run preview
+```
 
-## Join the community
+## Tests
 
-Join our community of developers creating universal apps.
+```bash
+npm test
+```
 
--   [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
--   [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+The reader-journey integration test uses Vitest, Testing Library, and Mock
+Service Worker to verify book search, adding a book to the library, and
+submitting an answer without requiring a running backend.

@@ -45,6 +45,12 @@
 - Clear local database
   `docker compose down -v  # Removes volumes`
 
+- Run tests
+  `uv run pytest`
+
+  The reader-journey integration test mocks Google Books, Audible, and OpenAI
+  service calls while exercising the authenticated API flow.
+
 ## Routes
 
 GET /api/v1/login -- login user

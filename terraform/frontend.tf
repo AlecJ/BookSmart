@@ -9,14 +9,22 @@ resource "render_static_site" "frontend" {
   root_directory = "frontend"
 
   # root_directory is the working directory for the build, so paths are relative to frontend/
-  build_command = "npm install && npx expo export --platform web"
-  publish_path  = "dist" # expo export --platform web outputs to dist/ relative to root_directory
+  build_command = "npm install && npm run build"
+  publish_path  = "dist"
+
+  routes = [
+    {
+      source      = "/*"
+      destination = "/index.html"
+      type        = "rewrite"
+    }
+  ]
 
   auto_deploy = true
 
   env_vars = {
-    # EXPO_PUBLIC_* vars are inlined at build time by Expo's bundler — not runtime.
+    # Vite inlines VITE_* vars at build time — not runtime.
     # This value is the backend URL provisioned by Terraform in the same apply.
-    EXPO_PUBLIC_API_URL = { value = render_web_service.backend.url }
+    VITE_API_URL = { value = render_web_service.backend.url }
   }
 }
