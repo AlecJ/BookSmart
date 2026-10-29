@@ -27,32 +27,20 @@ services:
     backend:
         build:
             context: ./backend
+            target: development
         depends_on:
             db:
                 condition: service_healthy
                 restart: true
         ports:
             - "8000:8000"
-        command:
-            - fastapi
-            - run
-            - --reload
-            - "app/main.py"
+        command: npm run dev
         env_file:
             - .env
         volumes:
-            - ./backend/app:/app/app
+            - ./backend/src:/app/src
+            - ./backend/schema.sql:/app/schema.sql
             - ./backend/seeds:/app/seeds
-        develop:
-            watch:
-                - path: ./backend
-                  action: sync
-                  target: /app
-                  ignore:
-                      - ./backend/.venv
-                      - .venv
-                - path: ./backend/pyproject.toml
-                  action: rebuild
         restart: always
 
 volumes:

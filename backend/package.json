@@ -1,0 +1,42 @@
+{
+	"name": "booksmart-backend",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "tsx watch src/server.ts",
+		"build": "tsc",
+		"start": "node dist/server.js",
+		"migrate": "tsx src/migrate.ts",
+		"seed:settings": "tsx src/seed.ts settings",
+		"seed:books": "tsx src/seed.ts books",
+		"test": "vitest run",
+		"test:watch": "vitest"
+	},
+	"engines": {
+		"node": ">=22"
+	},
+	"dependencies": {
+		"bcryptjs": "^3.0.2",
+		"cors": "^2.8.5",
+		"dotenv": "^16.5.0",
+		"express": "^5.1.0",
+		"jsonwebtoken": "^9.0.2",
+		"openai": "^7.45.0",
+		"pg": "^8.16.3",
+		"zod": "^4.6.7"
+	},
+	"devDependencies": {
+		"@types/cors": "^2.8.19",
+		"@types/express": "^5.0.3",
+		"@types/jsonwebtoken": "^9.0.10",
+		"@types/node": "^22.16.5",
+		"@types/pg": "^8.15.5",
+		"@types/supertest": "^6.0.3",
+		"pg-mem": "^3.0.5",
+		"supertest": "^7.1.3",
+		"tsx": "^4.20.3",
+		"typescript": "^5.9.2",
+		"vitest": "^5.0.5"
+	}
+}

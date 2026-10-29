@@ -1,44 +1,30 @@
-FROM python:3.12
+FROM node:22-alpine AS dependencies
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
 
-# ENV PYTHONUNBUFFERED=1
+FROM dependencies AS build
+COPY tsconfig.json ./
+COPY schema.sql ./
+COPY src ./src
+RUN npm run build
 
-WORKDIR /app/
+# Used by docker-compose: keeps dev dependencies (tsx) for `npm run dev`.
+FROM dependencies AS development
+COPY tsconfig.json schema.sql ./
+COPY src ./src
+COPY seeds ./seeds
+EXPOSE 8000
+CMD ["npm", "run", "dev"]
 
-# Install uv
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#installing-uv
-COPY --from=ghcr.io/astral-sh/uv:0.5.11 /uv /uvx /bin/
-
-# Place executables in the environment at the front of the path
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#using-the-environment
-ENV PATH="/app/.venv/bin:$PATH"
-
-# Compile bytecode
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#compiling-bytecode
-ENV UV_COMPILE_BYTECODE=1
-
-# uv Cache
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#caching
-ENV UV_LINK_MODE=copy
-
-# Install dependencies
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
-RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=uv.lock,target=uv.lock \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-project
-
-ENV PYTHONPATH=/app
-
-# COPY ./scripts /app/scripts
-
-COPY ./pyproject.toml ./uv.lock ./alembic.ini /app/
-
-COPY ./app /app/app
-COPY ./tests /app/tests
-
-# Sync the project
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync
-
-CMD ["fastapi", "run", "--workers", "4", "app/main.py"]
+FROM node:22-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+COPY package*.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+COPY --from=build --chown=node:node /app/dist ./dist
+COPY --chown=node:node schema.sql ./
+COPY --chown=node:node seeds ./seeds
+USER node
+EXPOSE 8000
+CMD ["node", "dist/server.js"]

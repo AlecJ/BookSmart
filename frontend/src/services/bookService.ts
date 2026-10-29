@@ -8,31 +8,40 @@ export const bookService = {
 	},
 
 	searchBooks: async (query: string): Promise<BookType[]> => {
-		const { data } = await api.get("/search", { params: { q: query } });
+		// The API retries Google once, so allow for two upstream attempts.
+		const { data } = await api.get("/search", { params: { q: query }, timeout: 25000 });
 		return data;
 	},
 
 	getOrCreateSearchBook: async (bookId: string): Promise<BookType> => {
-		const { data } = await api.get(`/search/${bookId}`);
+		const { data } = await api.get(`/search/${encodeURIComponent(bookId)}`);
 		return data;
 	},
 
 	addBookToLibrary: async (book: BookType): Promise<BookType> => {
-		const { data } = await api.post("/read/addBook", null, {
+		const { data } = await api.post("/read/addBook", undefined, {
 			params: { book_id: book.id },
 		});
 		return data;
 	},
 
+	removeBookFromLibrary: async (bookId: string): Promise<void> => {
+		await api.delete(`/read/book/${encodeURIComponent(bookId)}`);
+	},
+
 	getUserBookData: async (bookId: string): Promise<BookType> => {
-		const { data } = await api.get(`/read/book/${bookId}`);
+		// The first visit may look the chapter list up in several sources,
+		// ending with an OpenAI call.
+		const { data } = await api.get(`/read/book/${encodeURIComponent(bookId)}`, {
+			timeout: 60000,
+		});
 		return data;
 	},
 
 	getOrGenerateChapterQuestions: async (
 		chapterId: string,
 	): Promise<import("../types").BookChapterType> => {
-		const { data } = await api.get(`/read/chapter/${chapterId}/questions`, {
+		const { data } = await api.get(`/read/chapter/${encodeURIComponent(chapterId)}/questions`, {
 			timeout: 30000,
 		});
 		return data;
@@ -41,7 +50,7 @@ export const bookService = {
 	getUserResponse: async (
 		questionId: string,
 	): Promise<import("../types").UserResponseType> => {
-		const { data } = await api.get(`/read/question/${questionId}`);
+		const { data } = await api.get(`/read/question/${encodeURIComponent(questionId)}`);
 		return data;
 	},
 
@@ -49,7 +58,7 @@ export const bookService = {
 		questionId: string,
 		response: string,
 	): Promise<import("../types").UserResponseType> => {
-		const { data } = await api.post(`/read/question/${questionId}`, {
+		const { data } = await api.post(`/read/question/${encodeURIComponent(questionId)}`, {
 			response_text: response,
 		});
 		return data;
