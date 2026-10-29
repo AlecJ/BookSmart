@@ -22,18 +22,17 @@ resource "render_web_service" "backend" {
     }
   }
 
-  # Runs Alembic migrations in a temporary container before each new deploy.
-  # If the command exits non-zero, the current deploy is not replaced.
-  pre_deploy_command = "alembic upgrade head"
+  # Apply the idempotent PostgreSQL schema before replacing the running service.
+  pre_deploy_command = "node dist/migrate.js"
 
   env_vars = {
-    # Database — individual vars to match the app's Pydantic settings schema in core/config.py
+    # Database — individual vars read by the Express backend.
     POSTGRES_SERVER   = { value = neon_project.main.database_host }
     POSTGRES_PORT     = { value = "5432" }
     POSTGRES_USER     = { value = neon_project.main.database_user }
     POSTGRES_PASSWORD = { value = neon_project.main.database_password }
     POSTGRES_DB       = { value = neon_project.main.database_name }
-    # Neon requires SSL; psycopg respects this standard libpq environment variable
+    # Neon requires SSL; the PostgreSQL Node driver reads this setting.
     PGSSLMODE         = { value = "require" }
 
     # App

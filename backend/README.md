@@ -1,66 +1,71 @@
-# FastAPI Backend
+# Express Backend
+
+The API is implemented in Express and TypeScript, with PostgreSQL accessed through
+`pg`. The existing `/api/v1` routes and database table names are retained for
+compatibility with the web frontend and existing database.
 
 ## Requirements
 
-- Docker
-- uv
+- Node.js 22 or newer
+- PostgreSQL
 
-## Run Locally
+## Run locally
 
-- Copy `.env.EXAMPLE` and name it `.env`
+1. Configure the database and API credentials in the repository root `.env` file.
+2. Install dependencies and start the API:
 
-- (Optional) Update the postgres admin user, password, or app name, in your new `.env` file.
+   ```sh
+   cd backend
+   npm ci
+   npm run dev
+   ```
 
-- Bring up containers
-  `docker-compose up`
+The API listens on port 8000 by default. The server applies the idempotent
+`schema.sql` setup on startup. Run it separately with `npm run migrate` when
+needed. The migration setup uses `CREATE TABLE IF NOT EXISTS` to preserve data
+in databases already created by the former Alembic backend.
 
-    Visit site at ...
+To run the API and PostgreSQL in Docker from the repository root:
 
-## Useful Commands
+```sh
+docker compose up --build
+```
 
-- Set up local virtualenv
-  `uv venv`
-  `source .venv/bin/activate`
-  `uv sync`
+## Seed data
 
-- Update the projects environment
-  `uv add [package]`
-  `uv lock`
-  `uv sync`
+After the schema exists, run either seed command from `backend`:
 
-- Create a db migration
-  `alembic revision --autogenerate -m "message"`
-  or with docker
-  `docker compose exec backend alembic revision --autogenerate -m "message"`
+```sh
+npm run seed:settings
+npm run seed:books
+```
 
-- Apply a db migration
-  `alembic upgrade head`
-  or with docker
-  `docker compose exec backend alembic upgrade head`
+Seed settings include the prompt templates used by the OpenAI integration.
 
-- Seed the db
-  `docker compose exec backend seed_settings`
-  `docker compose exec backend seed_books`
+## Tests and build
 
-- Clear local database
-  `docker compose down -v  # Removes volumes`
+```sh
+npm test
+npm run build
+```
 
-- Run tests
-  `uv run pytest`
+The API journey test uses an in-memory PostgreSQL-compatible database and mocks
+Google Books, Audible, and OpenAI services. It exercises registration,
+searching, adding a book to the library, generating chapter questions, and
+submitting and retrieving an answer.
 
-  The reader-journey integration test mocks Google Books, Audible, and OpenAI
-  service calls while exercising the authenticated API flow.
+## API
 
-## Routes
+All API routes are under `/api/v1`. The primary user endpoints are:
 
-GET /api/v1/login -- login user
-POST /api/v1/register -- create user
+- `POST /users/register`
+- `POST /login/access-token`
+- `GET /search?q=...`
+- `GET /search/:googleBookId`
+- `GET /read/`
+- `POST /read/addBook?book_id=...`
+- `GET /read/book/:bookId`
+- `GET /read/chapter/:chapterId/questions`
+- `GET` and `POST /read/question/:questionId`
 
-GET /api/v1/profile -- view user page
-
-GET /api/v1/search -- perform search and return results
-GET /api/v1/read -- get users books
-POST /api/v1/read/{bookId} -- add book to user's library
-DEL /api/v1/read/{bookId} -- remove a book from a user's library
-GET /api/v1/read/{bookId} -- get book details/questions/chapters for user for one book
-POST /api/v1/read{bookId}/submit -- post users answers to questions and fetch feedback
+Authenticated endpoints require a bearer token.

@@ -1,7 +1,7 @@
 # BookSmart frontend
 
 BookSmart's frontend is a responsive React single-page application for web,
-built with Vite, TypeScript, and React Router. It uses the FastAPI backend
+built with Vite, TypeScript, and React Router. It uses the Express backend
 through the `VITE_API_URL` build-time environment variable.
 
 ## Local development

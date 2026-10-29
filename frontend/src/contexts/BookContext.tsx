@@ -5,6 +5,7 @@ import {
 	useContext,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from "react";
 import type { ReactNode } from "react";
@@ -32,24 +33,32 @@ interface BookContextValue {
 	selectedQuestion?: BookQuestionType;
 	setSelectedQuestion: (question: BookQuestionType | undefined) => void;
 	getUserBookData: (bookId: string) => Promise<BookType>;
-	getChapter: (chapterId: string) => BookChapterType | undefined;
 	getOrGenerateChapterQuestions: (chapterId: string) => Promise<void>;
-	getChapterQuestion: (questionId: string) => BookQuestionType | undefined;
 	searchBookResults: BookType[];
 	isSearching: boolean;
 	searchError: string;
 	searchBooks: (query: string) => Promise<void>;
 	viewSearchResultBook: (bookId: string) => Promise<BookType>;
-	bookDetailsError: string;
 	addBookToLibrary: (book: BookType) => Promise<BookType>;
+	removeBookFromLibrary: (bookId: string) => Promise<void>;
 	userResponse: string;
 	setUserResponse: (response: string) => void;
 	feedback?: UserResponseType;
-	getUserResponse: (questionId: string) => Promise<void>;
+	// Resolves to the saved answer, or undefined if there is none (or a newer
+	// request has replaced this one).
+	getUserResponse: (questionId: string) => Promise<UserResponseType | undefined>;
 	submitUserResponse: (response: string) => Promise<void>;
 }
 
 const BookContext = createContext<BookContextValue | undefined>(undefined);
+const PAGE_SIZE = 10;
+
+// Retry only failures that might succeed later (network errors, timeouts and
+// server errors), not client errors such as a missing chapter.
+function isRetryable(error: unknown): boolean {
+	if (!axios.isAxiosError(error)) return false;
+	return !error.response || error.response.status >= 500;
+}
 
 export function BookProvider({ children }: { children: ReactNode }) {
 	const { isLoading, isAuthenticated } = useAuth();
@@ -65,9 +74,12 @@ export function BookProvider({ children }: { children: ReactNode }) {
 	const [searchBookResults, setSearchBookResults] = useState<BookType[]>([]);
 	const [isSearching, setIsSearching] = useState(false);
 	const [searchError, setSearchError] = useState("");
-	const [bookDetailsError, setBookDetailsError] = useState("");
 	const [userResponse, setUserResponse] = useState("");
 	const [feedback, setFeedback] = useState<UserResponseType>();
+	// Only the most recent request may update state, so a slow earlier
+	// response can't overwrite a newer one.
+	const latestSearch = useRef("");
+	const latestResponseQuestion = useRef("");
 
 	const getUserBooks = useCallback(async () => {
 		if (!isAuthenticated) {
@@ -77,10 +89,10 @@ export function BookProvider({ children }: { children: ReactNode }) {
 		setBooksLoading(true);
 		setBooksError("");
 		try {
-			const result = await bookService.getBooks(10, 0);
+			const result = await bookService.getBooks(PAGE_SIZE, 0);
 			setBooks(result);
 			setBooksOffset(result.length);
-			setHasMoreBooks(result.length === 10);
+			setHasMoreBooks(result.length === PAGE_SIZE);
 		} catch (error) {
 			const message = getApiErrorMessage(error, "Failed to retrieve books.");
 			setBooksError(message);
@@ -91,21 +103,33 @@ export function BookProvider({ children }: { children: ReactNode }) {
 	}, [isAuthenticated]);
 
 	useEffect(() => {
-		if (!isLoading && isAuthenticated) {
+		if (isLoading) return;
+		if (isAuthenticated) {
 			void getUserBooks().catch((error: unknown) =>
 				console.error("Failed to load library:", error),
 			);
+			return;
 		}
+		// Signed out: drop the previous user's library and reading state.
+		setBooks([]);
+		setBooksError("");
+		setBooksOffset(0);
+		setHasMoreBooks(true);
+		setSelectedBook(undefined);
+		setSelectedChapter(undefined);
+		setSelectedQuestion(undefined);
+		setUserResponse("");
+		setFeedback(undefined);
 	}, [isLoading, isAuthenticated, getUserBooks]);
 
 	const loadMoreBooks = useCallback(async () => {
 		if (!isAuthenticated || !hasMoreBooks || isLoadingMoreBooks) return;
 		setIsLoadingMoreBooks(true);
 		try {
-			const result = await bookService.getBooks(10, booksOffset);
+			const result = await bookService.getBooks(PAGE_SIZE, booksOffset);
 			setBooks((current) => [...current, ...result]);
 			setBooksOffset((current) => current + result.length);
-			setHasMoreBooks(result.length === 10);
+			setHasMoreBooks(result.length === PAGE_SIZE);
 		} finally {
 			setIsLoadingMoreBooks(false);
 		}
@@ -117,35 +141,34 @@ export function BookProvider({ children }: { children: ReactNode }) {
 		return book;
 	}, []);
 
-	const getChapter = useCallback(
-		(chapterId: string) =>
-			selectedBook?.chapters?.find(
-				(chapter) => String(chapter.id) === chapterId,
-			),
-		[selectedBook],
-	);
+	// Keeps the selected chapter and its copy inside the selected book in sync,
+	// since the chapter and question pages read from the book.
+	const applyChapter = useCallback((chapter: BookChapterType) => {
+		setSelectedChapter(chapter);
+		setSelectedBook((current) =>
+			current
+				? {
+						...current,
+						chapters: current.chapters?.map((item) =>
+							item.id === chapter.id ? chapter : item,
+						),
+					}
+				: current,
+		);
+	}, []);
 
 	const getOrGenerateChapterQuestions = useCallback(
 		async (chapterId: string) => {
 			let lastError: unknown;
 			for (let attempt = 0; attempt < 3; attempt += 1) {
 				try {
-					const chapter =
-						await bookService.getOrGenerateChapterQuestions(chapterId);
-					setSelectedChapter(chapter);
-					setSelectedBook((current) =>
-						current
-							? {
-									...current,
-									chapters: current.chapters?.map((item) =>
-										item.id === chapter.id ? chapter : item,
-									),
-								}
-							: current,
+					applyChapter(
+						await bookService.getOrGenerateChapterQuestions(chapterId),
 					);
 					return;
 				} catch (error) {
 					lastError = error;
+					if (!isRetryable(error)) break;
 					if (attempt < 2) {
 						await new Promise((resolve) => window.setTimeout(resolve, 1500));
 					}
@@ -155,58 +178,63 @@ export function BookProvider({ children }: { children: ReactNode }) {
 				getApiErrorMessage(lastError, "Failed to load chapter questions."),
 			);
 		},
-		[],
-	);
-
-	const getChapterQuestion = useCallback(
-		(questionId: string) =>
-			selectedChapter?.questions?.find(
-				(question) => String(question.id) === questionId,
-			),
-		[selectedChapter],
+		[applyChapter],
 	);
 
 	const searchBooks = useCallback(async (query: string) => {
+		latestSearch.current = query;
 		setIsSearching(true);
 		setSearchError("");
 		try {
-			setSearchBookResults(await bookService.searchBooks(query));
+			const results = await bookService.searchBooks(query);
+			if (latestSearch.current === query) setSearchBookResults(results);
 		} catch (error) {
+			if (latestSearch.current !== query) return;
+			console.error("Book search failed:", error);
 			setSearchBookResults([]);
-			setSearchError(getApiErrorMessage(error, "Book search failed."));
+			setSearchError("Unable to retrieve your results. Please try again.");
 		} finally {
-			setIsSearching(false);
+			if (latestSearch.current === query) setIsSearching(false);
 		}
 	}, []);
 
 	const viewSearchResultBook = useCallback(async (bookId: string) => {
-		setBookDetailsError("");
-		try {
-			const book = await bookService.getOrCreateSearchBook(bookId);
-			setSelectedBook(book);
-			return book;
-		} catch (error) {
-			const message = getApiErrorMessage(error, "Failed to retrieve book details.");
-			setBookDetailsError(message);
-			throw new Error(message);
-		}
+		const book = await bookService.getOrCreateSearchBook(bookId);
+		setSelectedBook(book);
+		return book;
 	}, []);
 
 	const addBookToLibrary = useCallback(async (book: BookType) => {
 		const newBook = await bookService.addBookToLibrary(book);
 		setBooks((current) => [newBook, ...current]);
+		// The new book is first in the server's ordering, so later pages shift by one.
+		setBooksOffset((current) => current + 1);
 		return newBook;
 	}, []);
 
+	const removeBookFromLibrary = useCallback(async (bookId: string) => {
+		await bookService.removeBookFromLibrary(bookId);
+		setBooks((current) => current.filter((book) => book.id !== bookId));
+		// One fewer book precedes the next page on the server.
+		setBooksOffset((current) => Math.max(0, current - 1));
+		// The cached copy carries this user's chapters; drop it so re-opening
+		// the book goes through the server's library check.
+		setSelectedBook((current) => (current?.id === bookId ? undefined : current));
+	}, []);
+
 	const getUserResponse = useCallback(async (questionId: string) => {
+		latestResponseQuestion.current = questionId;
 		setUserResponse("");
 		setFeedback(undefined);
 		try {
 			const response = await bookService.getUserResponse(questionId);
+			if (latestResponseQuestion.current !== questionId) return undefined;
 			setUserResponse(response?.response_text || "");
 			setFeedback(response);
+			return response;
 		} catch (error) {
-			if (axios.isAxiosError(error) && error.response?.status === 404) return;
+			if (latestResponseQuestion.current !== questionId) return undefined;
+			if (axios.isAxiosError(error) && error.response?.status === 404) return undefined;
 			throw error;
 		}
 	}, []);
@@ -222,20 +250,37 @@ export function BookProvider({ children }: { children: ReactNode }) {
 			);
 			setFeedback(result);
 			setUserResponse(response);
-			setSelectedChapter((chapter) =>
-				chapter
+			const markAnswered = (chapter: BookChapterType): BookChapterType => ({
+				...chapter,
+				questions: chapter.questions?.map((question) =>
+					question.id === selectedQuestion.id
+						? { ...question, status: result.feedback_grade }
+						: question,
+				),
+			});
+			setSelectedChapter((chapter) => chapter && markAnswered(chapter));
+			setSelectedBook((book) =>
+				book
 					? {
-							...chapter,
-							questions: chapter.questions?.map((question) =>
-								question.id === selectedQuestion.id
-									? { ...question, status: result.feedback_grade }
-									: question,
+							...book,
+							chapters: book.chapters?.map((chapter) =>
+								chapter.id === selectedQuestion.chapter_id
+									? markAnswered(chapter)
+									: chapter,
 							),
 						}
-					: chapter,
+					: book,
 			);
+			// The server computes the chapter's overall status; refresh it so the
+			// book page reflects this answer. The question status is already set.
+			void bookService
+				.getOrGenerateChapterQuestions(selectedQuestion.chapter_id)
+				.then(applyChapter)
+				.catch((error: unknown) =>
+					console.error("Failed to refresh chapter status:", error),
+				);
 		},
-		[selectedQuestion],
+		[applyChapter, selectedQuestion],
 	);
 
 	const value = useMemo(
@@ -253,16 +298,14 @@ export function BookProvider({ children }: { children: ReactNode }) {
 			selectedQuestion,
 			setSelectedQuestion,
 			getUserBookData,
-			getChapter,
 			getOrGenerateChapterQuestions,
-			getChapterQuestion,
 			searchBookResults,
 			isSearching,
 			searchError,
 			searchBooks,
 			viewSearchResultBook,
-			bookDetailsError,
 			addBookToLibrary,
+			removeBookFromLibrary,
 			userResponse,
 			setUserResponse,
 			feedback,
@@ -281,16 +324,14 @@ export function BookProvider({ children }: { children: ReactNode }) {
 			selectedChapter,
 			selectedQuestion,
 			getUserBookData,
-			getChapter,
 			getOrGenerateChapterQuestions,
-			getChapterQuestion,
 			searchBookResults,
 			isSearching,
 			searchError,
 			searchBooks,
 			viewSearchResultBook,
-			bookDetailsError,
 			addBookToLibrary,
+			removeBookFromLibrary,
 			userResponse,
 			feedback,
 			getUserResponse,

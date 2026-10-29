@@ -7,6 +7,7 @@ import {
 	useState,
 } from "react";
 import type { ReactNode } from "react";
+import axios from "axios";
 import { api, getApiErrorMessage } from "../services/api";
 import { userService } from "../services/userService";
 
@@ -21,6 +22,12 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+
+// The API answers 401 for a missing token and 403 for an invalid or expired one.
+function isRejectedSession(error: unknown): boolean {
+	const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+	return status === 401 || status === 403;
+}
 
 function setAuthorization(token: string | null) {
 	if (token) {
@@ -48,8 +55,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				setIsAuthenticated(true);
 			} catch (error) {
 				console.error("Auth check failed:", error);
-				window.localStorage.removeItem(TOKEN_KEY);
-				setAuthorization(null);
+				if (isRejectedSession(error)) {
+					window.localStorage.removeItem(TOKEN_KEY);
+					setAuthorization(null);
+				} else {
+					// The API is unreachable or failing; keep the session so the
+					// user isn't signed out by an outage.
+					setIsAuthenticated(true);
+				}
 			} finally {
 				setIsLoading(false);
 			}
@@ -84,6 +97,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		setAuthorization(null);
 		setIsAuthenticated(false);
 	}, []);
+
+	// Sign out when the API rejects the token mid-session (e.g. it expired).
+	useEffect(() => {
+		const interceptor = api.interceptors.response.use(undefined, (error: unknown) => {
+			if (isRejectedSession(error) && window.localStorage.getItem(TOKEN_KEY)) {
+				logout();
+			}
+			return Promise.reject(error);
+		});
+		return () => api.interceptors.response.eject(interceptor);
+	}, [logout]);
 
 	const value = useMemo(
 		() => ({ isLoading, isAuthenticated, login, register, logout }),

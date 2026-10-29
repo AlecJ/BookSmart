@@ -3,7 +3,7 @@
 BookSmart is a companion app for readers that enhances comprehension with chapter-end quizzes and feedback via ChatGPT.
 
 Front End: React, TypeScript, Vite
-Back End: FastAPI, PostgreSQL
+Back End: Express, TypeScript, PostgreSQL
 
 ## Run Locally
 

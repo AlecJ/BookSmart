@@ -14,11 +14,13 @@ export interface BookType {
 	description: string;
 	image_url?: string;
 	progress?: number;
+	// Where the chapter list came from; "openai" lists are AI generated.
+	chapter_source?: "audible" | "openlibrary" | "openai" | null;
 	chapters?: BookChapterType[];
 }
 
 export interface BookChapterType {
-	id: number;
+	id: string;
 	book_id: string;
 	title: string;
 	status?: null | 0 | 1 | 2;
@@ -26,7 +28,7 @@ export interface BookChapterType {
 }
 
 export interface BookQuestionType {
-	id: number;
+	id: string;
 	chapter_id: string;
 	question_text: string;
 	userResponse?: UserResponseType;

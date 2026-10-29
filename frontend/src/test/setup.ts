@@ -3,6 +3,9 @@ import { cleanup } from "@testing-library/react";
 import { afterAll, afterEach, beforeAll } from "vitest";
 import { server } from "./server";
 
+// jsdom doesn't implement scrolling; ScrollToTop calls this on navigation.
+window.scrollTo = () => {};
+
 beforeAll(() => server.listen());
 afterEach(() => {
 	cleanup();
